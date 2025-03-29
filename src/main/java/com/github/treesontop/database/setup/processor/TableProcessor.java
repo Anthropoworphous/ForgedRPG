@@ -65,14 +65,11 @@ public class TableProcessor extends AbstractProcessor {
             out.print(className);
             out.print(" (");
 
-            out.print(columnMap.entrySet().stream().map(set -> {
-                String str = set.getKey().replace("_", "") +
-                        " " +
-                        set.getValue().datatype().type +
-                        " " +
-                        set.getValue().config().get().toString();
-                return str;
-            }).collect(Collectors.joining(",")));
+            out.print(columnMap.entrySet().stream().map(set -> set.getKey().replace("_", "") +
+                    " " +
+                    set.getValue().datatype().type +
+                    " " +
+                    set.getValue().config().get().toString()).collect(Collectors.joining(",")));
 
             out.println(") WITHOUT ROWID;\";");
             out.println("    }");

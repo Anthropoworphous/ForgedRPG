@@ -19,14 +19,14 @@ dependencies {
     annotationProcessor("com.google.auto.service:auto-service:1.1.1")
 
     // If you're using your own annotation processors
-    annotationProcessor(files("$buildDir/classes/java/main"))
+    annotationProcessor(files(layout.buildDirectory.dir("classes/java/main").get().asFile))
 }
 
 // Add a separate task for annotation processing
 tasks.register<JavaCompile>("processAnnotations") {
     source = sourceSets.main.get().java.sourceDirectories.asFileTree
     classpath = configurations.compileClasspath.get()
-    destinationDirectory.set(file("$buildDir/generated/sources/annotations"))
+    destinationDirectory.set(layout.buildDirectory.dir("generated/sources/annotations"))
 
     // Use Java 21
     sourceCompatibility = "21"
@@ -39,14 +39,14 @@ tasks.register<JavaCompile>("processAnnotations") {
 // Make the compile task depend on the annotation processing
 tasks.compileJava {
     dependsOn("processAnnotations")
-    source(fileTree("$buildDir/generated/sources/annotations"))
+    source(fileTree(layout.buildDirectory.dir("generated/sources/annotations").get().asFile))
 }
 
 // Make sure the annotation processor can find the compiled classes
 sourceSets {
     main {
         java {
-            srcDir("$buildDir/generated/sources/annotations")
+            srcDir(layout.buildDirectory.dir("generated/sources/annotations").get().asFile)
         }
     }
 }
