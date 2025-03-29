@@ -1,7 +1,6 @@
 package com.github.treesontop.database.setup.processor;
 
 import com.google.auto.service.AutoService;
-
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
@@ -9,35 +8,30 @@ import javax.lang.model.element.TypeElement;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-@SupportedAnnotationTypes("com.github.treesontop.database.setup.marker.MakeColumn")
+@SupportedAnnotationTypes("com.github.treesontop.database.setup.processor.MakeColumn")
 @SupportedSourceVersion(SourceVersion.RELEASE_21)
 @AutoService(Processor.class)
 public class TableProcessor extends AbstractProcessor {
-    public TableProcessor() {}
-
-    @Override
-    public Set<String> getSupportedAnnotationTypes() {
-        return Collections.singleton("com.github.treesontop.database.setup.marker.MakeColumn");
-    }
-
-    @Override
-    public SourceVersion getSupportedSourceVersion() {
-        return SourceVersion.RELEASE_21;
+    public TableProcessor() {
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (TypeElement annotation : annotations) {
             Set<? extends Element> elements = roundEnv.getElementsAnnotatedWith(annotation);
-            if (elements.isEmpty()) { continue; }
+            if (elements.isEmpty()) {
+                continue;
+            }
 
             var className = elements.stream().findAny().get().getEnclosingElement().getSimpleName().toString();
 
             var columnMap = new HashMap<String, MakeColumn>();
-            for(var e : elements) {
+            for (var e : elements) {
                 columnMap.put(e.getSimpleName().toString(), e.getAnnotation(MakeColumn.class));
             }
 
@@ -48,16 +42,10 @@ public class TableProcessor extends AbstractProcessor {
             }
         }
 
-
-        return false;
+        return true;
     }
 
-    private void writeTableFile(
-            String className, Map<String, MakeColumn> columnMap)
-            throws IOException {
-
-        int lastDot = className.lastIndexOf('.');
-
+    private void writeTableFile(String className, Map<String, MakeColumn> columnMap) throws IOException {
         String tableClassName = className + "Table";
 
         JavaFileObject builderFile = processingEnv.getFiler()
@@ -73,22 +61,20 @@ public class TableProcessor extends AbstractProcessor {
             out.println();
 
             out.println("    public String tableMaker() {");
-            out.print("        return \"CREATE TABLE IF NOT EXIST ");
+            out.print("        return \"CREATE TABLE IF NOT EXISTS ");
             out.print(className);
-            out.print("(");
+            out.print(" (");
 
             out.print(columnMap.entrySet().stream().map(set -> {
-                var str = new StringBuilder();
-                str.append(set.getKey().replace("_", ""));
-                str.append(" ");
-                str.append(set.getValue().datatype().type);
-                str.append(" ");
-                str.append(set.getValue().config().get().toString());
-                return str.toString();
+                String str = set.getKey().replace("_", "") +
+                        " " +
+                        set.getValue().datatype().type +
+                        " " +
+                        set.getValue().config().get().toString();
+                return str;
             }).collect(Collectors.joining(",")));
 
-            out.println(") WITHOUT ROWID;");
-
+            out.println(") WITHOUT ROWID;\";");
             out.println("    }");
 
             out.println("}");
