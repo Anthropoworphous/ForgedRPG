@@ -19,20 +19,24 @@ public class TeleportCommand extends PlayerOnlyCMDBase {
         ArgumentEntity targetArg = ArgumentType.Entity("target");
         ArgumentEntity otherTargetArg = ArgumentType.Entity("otherTarget").singleEntity(true);
 
-        builder.implement((p, ctx) -> p.teleport(ctx.get(posArg).from(p.getPosition()).asPosition()), posArg)
-            .implement(((p, ctx) -> {
-                Entity v = ctx.get(otherTargetArg).findFirstEntity(p);
-                if (v != null) p.teleport(v.getPosition());
-            }), otherTargetArg)
-            .implement(((p, ctx) -> {
-                List<Entity> list = ctx.get(targetArg).find(p);
-                Pos pos = ctx.get(posArg).from(p.getPosition()).asPosition();
-                list.forEach(v -> v.teleport(pos));
-            }), targetArg, posArg)
-            .implement((p, ctx) -> {
-                List<Entity> list = ctx.get(targetArg).find(null, null);
-                Entity v = ctx.get(otherTargetArg).findFirstEntity(p);
-                if (v != null) list.forEach(e -> e.teleport(v.getPosition()));
-            }, targetArg, otherTargetArg);
+        builder.implement((player, context) -> player.teleport(context.get(posArg).from(player.getPosition()).asPosition()), posArg)
+                .implement(((player, context) -> {
+                    Entity otherTargetEntity = context.get(otherTargetArg).findFirstEntity(player);
+                    if (otherTargetEntity != null) {
+                        player.teleport(otherTargetEntity.getPosition());
+                    }
+                }), otherTargetArg)
+                .implement(((player, context) -> {
+                    List<Entity> targetEntities = context.get(targetArg).find(player);
+                    Pos position = context.get(posArg).from(player.getPosition()).asPosition();
+                    targetEntities.forEach(entity -> entity.teleport(position));
+                }), targetArg, posArg)
+                .implement((player, context) -> {
+                    List<Entity> targetEntities = context.get(targetArg).find(null, null);
+                    Entity otherTargetEntity = context.get(otherTargetArg).findFirstEntity(player);
+                    if (otherTargetEntity != null) {
+                        targetEntities.forEach(entity -> entity.teleport(otherTargetEntity.getPosition()));
+                    }
+                }, targetArg, otherTargetArg);
     }
 }
