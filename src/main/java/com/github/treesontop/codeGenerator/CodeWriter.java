@@ -16,80 +16,95 @@ public class CodeWriter extends PrintWriter {
         super(out);
     }
 
-    public TypeReference useType(Class<?> c) {
-        var t = new TypeReference(c);
-        imports.put(c, t.getImport());
-        return t;
+    public TypeReference useType(Class<?> clazz) {
+        var typeReference = new TypeReference(clazz);
+        imports.put(clazz, typeReference.getImport());
+        return typeReference;
     }
 
     public Method makePublicStaticVoidMethod(String name, CodeBlock content, Parameter... methodInputs) {
         return new Method("public static void " + name, methodInputs, content);
     }
+
     public Method makePublicStaticMethod(String name, TypeReference returnType, CodeBlock content, Parameter... methodInputs) {
         return new Method("public static %s %s".formatted(returnType, name), methodInputs, content);
     }
+
     public Method makePrivateStaticVoidMethod(String name, CodeBlock content, Parameter... methodInputs) {
         return new Method("private static void " + name, methodInputs, content);
     }
+
     public Method makePrivateStaticMethod(String name, TypeReference returnType, CodeBlock content, Parameter... methodInputs) {
         return new Method("private static %s %s".formatted(returnType, name), methodInputs, content);
     }
+
     public Method makePublicVoidMethod(String name, CodeBlock content, Parameter... methodInputs) {
         return new Method("public void " + name, methodInputs, content);
     }
+
     public Method makePublicMethod(String name, TypeReference returnType, CodeBlock content, Parameter... methodInputs) {
         return new Method("public %s %s".formatted(returnType, name), methodInputs, content);
     }
+
     public Method makePrivateVoidMethod(String name, CodeBlock content, Parameter... methodInputs) {
         return new Method("private void " + name, methodInputs, content);
     }
+
     public Method makePrivateMethod(String name, TypeReference returnType, CodeBlock content, Parameter... methodInputs) {
         return new Method("private %s %s".formatted(returnType, name), methodInputs, content);
     }
 
     public static class CodeBlock {
-        private final int _indentLevel;
-        private final List<String> _lines = new ArrayList<>();
+        private final int indentLevel;
+        private final List<String> lines = new ArrayList<>();
 
         public CodeBlock(int indentLevel) {
-            this._indentLevel = indentLevel;
+            this.indentLevel = indentLevel;
         }
 
         @Override
         public String toString() {
             var str = new StringBuilder();
 
-            _lines.forEach(l -> str.append(indent(_indentLevel + 1)).append(l).append("%n"));
+            lines.forEach(line -> str.append(indent(indentLevel + 1)).append(line).append("%n"));
 
-            return "%s%s%n%s%s}".formatted(indent(_indentLevel), header(), str, indent(_indentLevel));
+            return "%s%s%n%s%s}".formatted(indent(indentLevel), header(), str, indent(indentLevel));
         }
 
-        public String header() { return ""; }
+        public String header() {
+            return "";
+        }
 
-        public CodeBlock append(String line) { _lines.add(line); return this; }
+        public CodeBlock append(String line) {
+            lines.add(line);
+            return this;
+        }
+
         public CodeBlock append(CodeBlock block) {
-            var hdr = block.header();
-            if (!hdr.isBlank()) { _lines.add(hdr); }
-            for (String l : block._lines) {
-                String indent = indent(block._indentLevel - _indentLevel);
-                _lines.add(indent + l);
+            var header = block.header();
+            if (!header.isBlank()) {
+                lines.add(header);
             }
-            _lines.add("}");
+            for (String line : block.lines) {
+                String indent = indent(block.indentLevel - indentLevel);
+                lines.add(indent + line);
+            }
+            lines.add("}");
             return this;
         }
     }
 
     public static class If extends CodeBlock {
-        private final String _comparison;
+        private final String comparison;
 
         public If(String comparison, int indentLevel) {
             super(indentLevel);
-            _comparison = comparison;
+            this.comparison = comparison;
         }
 
         @Override
         public String header() {
-            return "if (%s) {".formatted(_comparison);
+            return "if (%s) {".formatted(comparison);
         }
 
         public static class Else extends CodeBlock {
@@ -102,6 +117,7 @@ public class CodeWriter extends PrintWriter {
                 return "else {";
             }
         }
+
         public static class ElseIf extends If {
             public ElseIf(String comparison, byte indentLevel) {
                 super(comparison, indentLevel);
@@ -113,38 +129,38 @@ public class CodeWriter extends PrintWriter {
             }
         }
     }
+
     public static class For extends CodeBlock {
-        private final Assignment _counter;
-        private final String _comparison;
-        private final String _change;
+        private final Assignment counter;
+        private final String comparison;
+        private final String change;
 
         public For(Assignment counter, String comparison, String change, int indentLevel) {
             super(indentLevel);
-            _counter = counter;
-            _comparison = comparison;
-            _change = change;
+            this.counter = counter;
+            this.comparison = comparison;
+            this.change = change;
         }
 
         @Override
         public String header() {
-            return "for(%s; %s; %s) {".formatted(_counter, _comparison, _change);
+            return "for(%s; %s; %s) {".formatted(counter, comparison, change);
         }
     }
+
     public static class While extends CodeBlock {
-        private final String _comparison;
+        private final String comparison;
 
         public While(String comparison, int indentLevel) {
             super(indentLevel);
-            _comparison = comparison;
+            this.comparison = comparison;
         }
 
         @Override
         public String header() {
-            return "while(%s) {".formatted(_comparison);
+            return "while(%s) {".formatted(comparison);
         }
     }
-
-
 
     public record Parameter(String name, TypeReference type) {
         @Override
@@ -152,6 +168,7 @@ public class CodeWriter extends PrintWriter {
             return "%s %s".formatted(type().literal(), name);
         }
     }
+
     public record Assignment(Parameter param, String statement) {
         @Override
         public String toString() {
@@ -159,18 +176,18 @@ public class CodeWriter extends PrintWriter {
         }
     }
 
-    private record TypeReference(Class<?> c) {
+    private record TypeReference(Class<?> clazz) {
         public String literal() {
-            var str = c.getSimpleName();
+            var str = clazz.getSimpleName();
             if (str.isBlank()) {
-                throw new RuntimeException("Unable to get name of class " + c);
+                throw new RuntimeException("Unable to get name of class " + clazz);
             }
             return str;
         }
 
         public String getImport() {
-            if (c.getPackageName().equals("java.lang")) return "";
-            return String.format("import %s.%s%n", c.getPackageName(), literal());
+            if (clazz.getPackageName().equals("java.lang")) return "";
+            return String.format("import %s.%s%n", clazz.getPackageName(), literal());
         }
 
         @Override
@@ -196,20 +213,7 @@ public class CodeWriter extends PrintWriter {
         }
     }
 
-    private static String indent(int level) { return level <= 0 ? "" : "    " + indent(level - 1); }
-
-//
-//    public static void main(String[] args) throws FileNotFoundException {
-//        var w = new CodeWriter();
-//        var e = w.makePrivateMethod("kys", w.useType(String.class),
-//                new If("owo == false", 1).append(
-//                        new While("false", 2)
-//                                .append("kys(owo);")
-//                                .append(new For(new Assignment(new Parameter("i", w.useType(Integer.class)), "0"), "< 5", "i++", 3)
-//                                        .append("gay(you);"))
-//                ), new Parameter("owo", w.useType(Boolean.class)));
-//
-//        System.out.printf((e.toString()) + "%n");
-//        w.imports.values().forEach(System.out::print);
-//    }
+    private static String indent(int level) {
+        return level <= 0 ? "" : "    " + indent(level - 1);
+    }
 }
