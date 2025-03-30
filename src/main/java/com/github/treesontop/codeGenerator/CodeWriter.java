@@ -6,7 +6,8 @@ import javax.annotation.processing.ProcessingEnvironment;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CodeWriter extends PrintWriter {
     private final Map<Class<?>, String> imports = new HashMap<>(); //Don't print new line, it's included

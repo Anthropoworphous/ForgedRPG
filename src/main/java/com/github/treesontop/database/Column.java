@@ -1,8 +1,5 @@
 package com.github.treesontop.database;
 
-import java.util.ArrayList;
-import java.util.stream.Collectors;
-
 public class Column {
     public final SQLDataType dataType;
     public final Config config;

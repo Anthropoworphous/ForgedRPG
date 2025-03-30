@@ -1,7 +1,5 @@
 package com.github.treesontop.codeGenerator;
 
-import java.util.Objects;
-
 public class TypeReference {
     private final Class<?> clazz;
 

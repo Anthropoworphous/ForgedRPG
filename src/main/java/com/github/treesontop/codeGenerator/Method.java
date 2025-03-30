@@ -1,8 +1,6 @@
 package com.github.treesontop.codeGenerator;
 
-import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public final class Method extends CodeBlock {

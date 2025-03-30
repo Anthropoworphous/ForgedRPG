@@ -5,17 +5,15 @@ import com.github.treesontop.database.Column;
 import com.github.treesontop.database.SQLDataType;
 import com.github.treesontop.database.Table;
 import com.google.auto.service.AutoService;
+
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.tools.JavaFileObject;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @SupportedAnnotationTypes("com.github.treesontop.database.setup.processor.MakeColumn")
 @SupportedSourceVersion(SourceVersion.RELEASE_21)

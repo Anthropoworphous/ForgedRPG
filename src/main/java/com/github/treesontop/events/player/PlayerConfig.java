@@ -1,6 +1,5 @@
 package com.github.treesontop.events.player;
 
-import com.github.treesontop.Main;
 import com.github.treesontop.World;
 import com.github.treesontop.events.EventBase;
 import com.github.treesontop.events.RegisterEvent;
