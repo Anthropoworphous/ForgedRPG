@@ -22,6 +22,15 @@ dependencies {
     annotationProcessor(files(layout.buildDirectory.dir("classes/java/main").get().asFile))
 }
 
+// Make sure the annotation processor can find the compiled classes
+sourceSets {
+    main {
+        java {
+            srcDir(layout.buildDirectory.dir("generated/sources/annotations").get().asFile)
+        }
+    }
+}
+
 // Add a separate task for annotation processing
 tasks.register<JavaCompile>("processAnnotations") {
     source = sourceSets.main.get().java.sourceDirectories.asFileTree
@@ -40,13 +49,4 @@ tasks.register<JavaCompile>("processAnnotations") {
 tasks.compileJava {
     dependsOn("processAnnotations")
     source(fileTree(layout.buildDirectory.dir("generated/sources/annotations").get().asFile))
-}
-
-// Make sure the annotation processor can find the compiled classes
-sourceSets {
-    main {
-        java {
-            srcDir(layout.buildDirectory.dir("generated/sources/annotations").get().asFile)
-        }
-    }
 }

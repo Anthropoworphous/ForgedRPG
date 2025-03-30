@@ -1,5 +1,7 @@
 package com.github.treesontop.database.setup.processor;
 
+import com.github.treesontop.Util;
+import com.github.treesontop.codeGenerator.CodeWriter;
 import com.google.auto.service.AutoService;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -46,35 +48,64 @@ public class TableProcessor extends AbstractProcessor {
     }
 
     private void writeTableFile(String className, Map<String, MakeColumn> columnMap) throws IOException {
-        String tableClassName = className + "Table";
+        String tableClassName = className + "Table"; //for use in java
+        String tableName = className.toLowerCase(); //for use in SQL
 
         JavaFileObject builderFile = processingEnv.getFiler()
                 .createSourceFile("com.github.treesontop.database.setup." + tableClassName);
 
-        try (PrintWriter out = new PrintWriter(builderFile.openWriter())) {
-            out.println("package com.github.treesontop.database.setup;");
+        try (CodeWriter out = new CodeWriter(builderFile.openWriter())) {
+            printStaticClassStart(out, tableClassName);
+
+            out.println("    public static Table table;");
             out.println();
 
-            out.print("public class ");
-            out.print(tableClassName);
-            out.println(" {");
-            out.println();
+            out.println("    static {");
+            out.printf("        var bdr = new Table.Builder(\"%s\");%n", tableName);
 
-            out.println("    public String tableMaker() {");
-            out.print("        return \"CREATE TABLE IF NOT EXISTS ");
-            out.print(className);
-            out.print(" (");
+            columnMap.forEach((name, data) ->
+                    out.printf("        bdr.insertColumn(\"%s\", new Column(SQLDataType.%s, MakeColumn.Config.%s.get()));%n",
+                    name.replace("_", "").toLowerCase(),
+                    data.datatype(),
+                    data.config().name())
+            );
 
-            out.print(columnMap.entrySet().stream().map(set -> set.getKey().replace("_", "") +
-                    " " +
-                    set.getValue().datatype().type +
-                    " " +
-                    set.getValue().config().get().toString()).collect(Collectors.joining(",")));
+            out.println("        table = bdr.build();");
+            out.printf("    }%n%n");
 
-            out.println(") WITHOUT ROWID;\";");
-            out.println("    }");
+//            printStaticFunctionStart(out, "String", "tableMaker");
 
-            out.println("}");
+
+            var cd = new CodeWriter.CodeBlock(1);
+            var columns = columnMap.entrySet().stream().map(set ->
+                    "%s %s %s".formatted(
+                            set.getKey().replace("_", "").toLowerCase(),
+                            set.getValue().datatype().type,
+                            set.getValue().config().get().toString()
+                    )
+            ).collect(Collectors.joining(", "));
+
+            cd.append("return \"CREATE TABLE IF NOT EXIST %s (%s) WITHOUT ROWID;\";".formatted(
+                    tableName, columns
+            ));
+            var method = out.makePublicStaticMethod("tableMaker", out.useType(String.class), cd);
+            out.printf("    " + method.toString());
         }
+    }
+
+    private void printStaticClassStart(PrintWriter out, String className) {
+        out.println("package com.github.treesontop.database.setup;");
+        out.println();
+        out.println("import com.github.treesontop.database.Column;");
+        out.println("import com.github.treesontop.database.SQLDataType;");
+        out.println("import com.github.treesontop.database.Table;");
+        out.println("import com.github.treesontop.database.setup.processor.MakeColumn;");
+        out.println();
+
+        out.printf("public class %s {%n", className);
+    }
+
+    private void printStaticFunctionStart(PrintWriter out, String returnType, String functionName, String... var) {
+        out.printf("    public static %s %s(%s) {%n", returnType, functionName, String.join(", ", var));
     }
 }

@@ -8,7 +8,7 @@ public class Table {
     private final Map<String, Column> _columns;
     private final Set<String> _primaryKeys;
 
-    public Table(TableBuilder bdr) {
+    public Table(Builder bdr) {
         name = bdr._name;
         _columns = Collections.unmodifiableMap(bdr._columns);
         _primaryKeys = bdr._columns.entrySet().stream()
@@ -19,15 +19,15 @@ public class Table {
 
 
 
-    public static class TableBuilder {
+    public static class Builder {
         private String _name;
         private final Map<String, Column> _columns;
 
-        public TableBuilder(String name) {
+        public Builder(String name) {
             _columns = new HashMap<>();
         }
 
-        public void InsertColumn(String name, Column column) {
+        public void insertColumn(String name, Column column) {
             _columns.put(name, column);
         }
 
