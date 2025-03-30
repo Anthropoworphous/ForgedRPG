@@ -1,7 +1,9 @@
 package com.github.treesontop.database.setup.processor;
 
-import com.github.treesontop.Util;
-import com.github.treesontop.codeGenerator.CodeWriter;
+import com.github.treesontop.codeGenerator.*;
+import com.github.treesontop.database.Column;
+import com.github.treesontop.database.SQLDataType;
+import com.github.treesontop.database.Table;
 import com.google.auto.service.AutoService;
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -51,61 +53,59 @@ public class TableProcessor extends AbstractProcessor {
         String tableClassName = className + "Table"; //for use in java
         String tableName = className.toLowerCase(); //for use in SQL
 
-        JavaFileObject builderFile = processingEnv.getFiler()
-                .createSourceFile("com.github.treesontop.database.setup." + tableClassName);
+        try (CodeWriter out = new CodeWriter(processingEnv, "com.github.treesontop.database.setup", tableClassName)) {
+            var classBlock = new ClassBlock(AccessModifiers.Scope.PUBLIC.get(), tableClassName, 0);
 
-        try (CodeWriter out = new CodeWriter(builderFile.openWriter())) {
-            printStaticClassStart(out, tableClassName);
+            classBlock.append(new Field(
+                    AccessModifiers.Scope.PUBLIC.getStatic(),
+                    new Parameter("table", out.useType(Table.class)))
+            );
+            classBlock.newLine();
 
-            out.println("    public static Table table;");
-            out.println();
+            out.useType(Table.class);
+            out.useType(Column.class);
+            out.useType(SQLDataType.class);
+            out.useType(MakeColumn.class);
 
-            out.println("    static {");
-            out.printf("        var bdr = new Table.Builder(\"%s\");%n", tableName);
-
-            columnMap.forEach((name, data) ->
-                    out.printf("        bdr.insertColumn(\"%s\", new Column(SQLDataType.%s, MakeColumn.Config.%s.get()));%n",
-                    name.replace("_", "").toLowerCase(),
-                    data.datatype(),
-                    data.config().name())
+            var staticBlock = new CodeBlock.StaticBlock(1).append(
+                    "var bdr = new Table.Builder(\"%s\");".formatted(tableName)
             );
 
-            out.println("        table = bdr.build();");
-            out.printf("    }%n%n");
+            columnMap.forEach((name, data) -> staticBlock.append(
+                    "bdr.insertColumn(\"%s\", new Column(SQLDataType.%s, MakeColumn.Config.%s.get()));".formatted(
+                            name.replace("_", "").toLowerCase(),
+                            data.datatype(),
+                            data.config().name()
+                    ))
+            );
+            staticBlock.append("table = bdr.build();");
 
-//            printStaticFunctionStart(out, "String", "tableMaker");
+            classBlock.append(staticBlock);
+            classBlock.newLine();
 
+            var sqlColumns = new CodeBlock.ArbitraryBlock(4);
+            columnMap.forEach((key, value) ->
+                    sqlColumns.append("%s %s %s".formatted(
+                            key.replace("_", "").toLowerCase(),
+                            value.datatype().type,
+                            value.config().get().toString()
+                    ))
+            );
 
-            var cd = new CodeWriter.CodeBlock(1);
-            var columns = columnMap.entrySet().stream().map(set ->
-                    "%s %s %s".formatted(
-                            set.getKey().replace("_", "").toLowerCase(),
-                            set.getValue().datatype().type,
-                            set.getValue().config().get().toString()
-                    )
-            ).collect(Collectors.joining(", "));
+            classBlock.append(new Method(
+                    new AccessModifiers(AccessModifiers.Scope.PUBLIC, true, false),
+                    out.useType(String.class),
+                    "tableMaker"
+            ).append("return")
+                    .append(new CodeBlock.TextBlock(2)
+                            .append(new CodeBlock.ArbitraryBlock(3)
+                                    .append("CREATE TABLE IF NOT EXIST %s (".formatted(tableName))
+                                    .append(sqlColumns)
+                                    .append(") WITHOUT ROWID;"))));
 
-            cd.append("return \"CREATE TABLE IF NOT EXIST %s (%s) WITHOUT ROWID;\";".formatted(
-                    tableName, columns
-            ));
-            var method = out.makePublicStaticMethod("tableMaker", out.useType(String.class), cd);
-            out.printf("    " + method.toString());
+            out.printPackage();
+            out.printImport();
+            out.printf(classBlock.toString());
         }
-    }
-
-    private void printStaticClassStart(PrintWriter out, String className) {
-        out.println("package com.github.treesontop.database.setup;");
-        out.println();
-        out.println("import com.github.treesontop.database.Column;");
-        out.println("import com.github.treesontop.database.SQLDataType;");
-        out.println("import com.github.treesontop.database.Table;");
-        out.println("import com.github.treesontop.database.setup.processor.MakeColumn;");
-        out.println();
-
-        out.printf("public class %s {%n", className);
-    }
-
-    private void printStaticFunctionStart(PrintWriter out, String returnType, String functionName, String... var) {
-        out.printf("    public static %s %s(%s) {%n", returnType, functionName, String.join(", ", var));
     }
 }
