@@ -10,9 +10,13 @@ repositories {
 }
 
 dependencies {
-    implementation("net.minestom:minestom-snapshots:f71ab6d851")
+    implementation("net.minestom:minestom-snapshots:0366b58bfe")
     implementation("org.reflections:reflections:0.10.2")
     implementation("org.xerial:sqlite-jdbc:3.49.1.0")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.4")
+    testImplementation("org.mockito:mockito-core:5.16.1")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.16.1")
 
     // Annotation processor dependencies
     compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")

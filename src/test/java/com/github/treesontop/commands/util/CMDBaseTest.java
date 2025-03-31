@@ -2,7 +2,6 @@ package com.github.treesontop.commands.util;
 
 import net.minestom.server.command.CommandManager;
 import net.minestom.server.command.builder.Command;
-import net.minestom.server.command.builder.CommandExecutor;
 import net.minestom.server.command.builder.arguments.Argument;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.entity.Player;

@@ -2,10 +2,11 @@ package com.github.treesontop;
 
 import com.github.treesontop.commands.util.CMDBase;
 import com.github.treesontop.commands.util.PlayerOnlyCMDBase;
+import com.github.treesontop.commands.util.RegisterCommand;
 import com.github.treesontop.database.DataBase;
 import com.github.treesontop.events.EventBase;
+import com.github.treesontop.events.RegisterEvent;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.instance.Instance;
 import net.minestom.server.instance.InstanceManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,24 +15,20 @@ import java.io.InvalidObjectException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 public class MainTest {
-
-    private Main main;
     private MinecraftServer minecraftServer;
     private InstanceManager instanceManager;
     private Logger logger;
 
     @BeforeEach
     public void setUp() {
-        main = new Main();
         minecraftServer = mock(MinecraftServer.class);
         instanceManager = mock(InstanceManager.class);
         logger = mock(Logger.class);
@@ -39,13 +36,13 @@ public class MainTest {
 
     @Test
     public void testStartUp() {
-        main.startUp();
+        Main.startUp();
         verify(minecraftServer, times(1)).start("0.0.0.0", 25565);
     }
 
     @Test
     public void testConnectToDB() {
-        String url = "C:\\Users\\kevin\\IdeaProjects\\ForgeRPG\\TempSQLDataBase\\data.db";
+        String url = "jdbc:sqlite:c:/Users/kevin/IdeaProjects/ForgeRPG/TempSQLDataBase/data.db";
         try (Connection conn = DriverManager.getConnection(url)) {
             DataBase.setupDataBase(conn);
             assertNotNull(conn);
@@ -59,7 +56,7 @@ public class MainTest {
         Set<Class<?>> eventClasses = Set.of(EventBase.class);
         when(Util.getAnnotatedClass("com.github.treesontop.events", RegisterEvent.class)).thenReturn(eventClasses);
 
-        main.registerEvent();
+        Main.registerEvent();
 
         verify(logger, times(1)).info("Events to register: " + eventClasses.size());
         for (Class<?> eventClass : eventClasses) {
@@ -72,7 +69,7 @@ public class MainTest {
         Set<Class<?>> commandClasses = Set.of(CMDBase.class, PlayerOnlyCMDBase.class);
         when(Util.getAnnotatedClass("com.github.treesontop.commands", RegisterCommand.class)).thenReturn(commandClasses);
 
-        main.registerCommand();
+        Main.registerCommand();
 
         verify(logger, times(1)).info("Commands to register: " + commandClasses.size());
         for (Class<?> commandClass : commandClasses) {

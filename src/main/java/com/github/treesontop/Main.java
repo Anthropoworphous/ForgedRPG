@@ -4,6 +4,7 @@ import com.github.treesontop.commands.util.CMDBase;
 import com.github.treesontop.commands.util.PlayerOnlyCMDBase;
 import com.github.treesontop.commands.util.RegisterCommand;
 import com.github.treesontop.database.DataBase;
+import com.github.treesontop.database.setup.UserTable;
 import com.github.treesontop.events.EventBase;
 import com.github.treesontop.events.RegisterEvent;
 import net.minestom.server.MinecraftServer;
@@ -20,6 +21,7 @@ import net.minestom.server.timer.SchedulerManager;
 import java.io.InvalidObjectException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -63,7 +65,7 @@ public class Main {
      * Connects to the database.
      */
     public static void connectToDB() {
-        var url = "C:\\Users\\kevin\\IdeaProjects\\ForgeRPG\\TempSQLDataBase\\data.db";
+        var url = "jdbc:sqlite:C:/Users/kevin/IdeaProjects/ForgeRPG/TempSQLDataBase/data.db";
 
         try (var conn = DriverManager.getConnection(url)) {
             DataBase.setupDataBase(conn);
@@ -80,6 +82,9 @@ public class Main {
      * Starts the server and sets up the world.
      */
     private static void startServer() {
+        System.out.println(UserTable.tableMaker());
+        System.out.println(UserTable.querySingle(Collections.singleton("money"), Map.of("uuid", "e")));
+
         startUpProperties();
         setupWorld();
     }
@@ -135,7 +140,7 @@ public class Main {
      *
      * @throws Exception if an error occurs during event registration
      */
-    private static void registerEvent() throws Exception {
+    static void registerEvent() throws Exception {
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
 
         Set<Class<?>> v = Util.getAnnotatedClass("com.github.treesontop.events", RegisterEvent.class);
@@ -151,7 +156,7 @@ public class Main {
      *
      * @throws ReflectiveOperationException if an error occurs during command registration
      */
-    private static void registerCommand() throws ReflectiveOperationException {
+    static void registerCommand() throws ReflectiveOperationException {
         Set<Class<?>> v = Util.getAnnotatedClass("com.github.treesontop.commands", RegisterCommand.class);
         logger.info("Commands to register: " + v.size());
         for (Class<?> c : v) {

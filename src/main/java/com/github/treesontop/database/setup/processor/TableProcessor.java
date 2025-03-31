@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @SupportedAnnotationTypes("com.github.treesontop.database.setup.processor.MakeColumn")
 @SupportedSourceVersion(SourceVersion.RELEASE_21)
@@ -52,7 +54,10 @@ public class TableProcessor extends AbstractProcessor {
         String tableName = className.toLowerCase(); //for use in SQL
 
         try (CodeWriter out = new CodeWriter(processingEnv, "com.github.treesontop.database.setup", tableClassName)) {
-            var classBlock = new ClassBlock(AccessModifiers.Scope.PUBLIC.get(), tableClassName, 0);
+            var classBlock = new ClassBlock(AccessModifiers.Scope.PUBLIC.get(),
+                tableClassName,
+                0,
+                out.useType(GeneratedTable.class));
 
             classBlock.append(new Field(
                     AccessModifiers.Scope.PUBLIC.getStatic(),
@@ -91,16 +96,56 @@ public class TableProcessor extends AbstractProcessor {
                     ))
             );
 
+            //Table maker
             classBlock.append(new Method(
-                    new AccessModifiers(AccessModifiers.Scope.PUBLIC, true, false),
-                    out.useType(String.class),
-                    "tableMaker"
+                AccessModifiers.Scope.PUBLIC.getStatic(),
+                out.useType(String.class),
+                "tableMaker"
             ).append("return")
-                    .append(new CodeBlock.TextBlock(2)
+                .append(new CodeBlock.TextBlock(2)
+                    .append(new CodeBlock.ArbitraryBlock(3)
+                        .append("CREATE TABLE IF NOT EXIST %s (".formatted(tableName))
+                        .append(sqlColumns)
+                        .append(") WITHOUT ROWID;"))));
+
+            //Single Query
+            var columnKeyMap = columnMap.entrySet().stream()
+                .collect(Collectors.partitioningBy(
+                    set -> set.getValue().config().get().PrimaryKey(),
+                    Collectors.mapping(
+                        set -> set.getKey().replace("_", "").toLowerCase(),
+                        Collectors.toSet()
+                    ))
+                );
+
+            classBlock.newLine();
+
+            if (columnKeyMap.get(false).isEmpty()) {
+                classBlock.append("//because there is no value that's not a key, single query is not generated");
+            } else {
+                out.useType(Pattern.class);
+
+                classBlock.append(new Method(
+                        AccessModifiers.Scope.PUBLIC.getStatic(),
+                        out.useType(String.class),
+                        "querySingle",
+                        new Parameter("queryColumn", out.useType(Set.class, out.useType(String.class))),
+                        new Parameter("keyValue", out.useType(Map.class, out.useType(String.class), out.useType(String.class)))
+                    ).append("var statement = ")
+                        .append(new CodeBlock.TextBlock(2)
                             .append(new CodeBlock.ArbitraryBlock(3)
-                                    .append("CREATE TABLE IF NOT EXIST %s (".formatted(tableName))
-                                    .append(sqlColumns)
-                                    .append(") WITHOUT ROWID;"))));
+                                .append("SELECT %s FROM %s".formatted(String.join(", ", columnKeyMap.get(false)), tableName))
+                                .append("WHERE %s;".formatted(columnKeyMap.get(true).stream()
+                                    .map("kv@%s@"::formatted)
+                                    .collect(Collectors.joining(" AND "))
+                                ))
+                            )
+                        ).append("return Pattern.compile(\"kv@(\\\\w+)@\")")
+                        .append("    .matcher(statement).replaceAll(str -> str.group(1) + \" = \" + keyValue.get(str.group(1)));")
+                );
+            }
+
+
 
             out.printPackage();
             out.printImport();

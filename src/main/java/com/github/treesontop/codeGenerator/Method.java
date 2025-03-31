@@ -4,23 +4,22 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public final class Method extends CodeBlock {
-    private final AccessModifiers access;
-    private final TypeReference returnType;
-    private final String name;
-    private final Parameter[] inputs;
+    private final String header;
+    private boolean isOverride = false;
 
     public Method(AccessModifiers access, TypeReference returnType, String name, Parameter... inputs) {
         super(1);
-        this.access = access;
-        this.returnType = returnType;
-        this.name = name;
-        this.inputs = inputs;
+        header = "%s %s %s(%s) {".formatted(access.toString(), returnType.literal(), name, Arrays.stream(inputs)
+            .map(Parameter::toString)
+            .collect(Collectors.joining(", ")));
+    }
+
+    public void isOverride() {
+        isOverride = true;
     }
 
     @Override
     public String header() {
-        return "%s %s %s(%s) {".formatted(access.toString(), returnType.literal(), name, Arrays.stream(inputs)
-                .map(Parameter::toString)
-                .collect(Collectors.joining(", ")));
+        return isOverride ? "@Override%n%s%s".formatted("    ".repeat(indentLevel), header) : header;
     }
 }
