@@ -76,6 +76,7 @@ public class TableProcessor extends AbstractProcessor {
                             data.config().name()
                     ))
             );
+
             staticBlock.append("table = bdr.build();");
 
             classBlock.append(staticBlock);
