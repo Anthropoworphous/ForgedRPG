@@ -11,13 +11,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CMDBuilder {
+    private static final Logger logger = Logger.getLogger(CMDBuilder.class.getName());
+
     byte counts = 0;
     final List<CommandExecutor> executor = new ArrayList<>();
     final List<List<Supplier<String>>> annotations = new ArrayList<>();
     final List<Argument<?>[]> argList = new ArrayList<>();
 
+    /**
+     * Implements a command with the provided executor, annotation, and arguments.
+     *
+     * @param exe        the command executor
+     * @param annotation the annotation consumer
+     * @param args       the command arguments
+     * @return the CMDBuilder instance
+     */
     @CanIgnoreReturnValue
     public CMDBuilder implement(
             CommandExecutor exe,
@@ -36,6 +48,13 @@ public class CMDBuilder {
         return this;
     }
 
+    /**
+     * Implements a command with the provided executor and arguments.
+     *
+     * @param ctx  the command executor
+     * @param args the command arguments
+     * @return the CMDBuilder instance
+     */
     @CanIgnoreReturnValue
     public CMDBuilder implement(
             CommandExecutor ctx,
@@ -44,6 +63,13 @@ public class CMDBuilder {
         return implement(ctx, null, args);
     }
 
+    /**
+     * Generates a list of argument descriptions for the specified command.
+     *
+     * @param cmdName the command name
+     * @param index   the index of the command
+     * @return a list of TextComponent representing the argument descriptions
+     */
     public List<TextComponent> generateArgsDescription(String cmdName, int index) {
         ArrayList<TextComponent> l = new ArrayList<>();
         l.add(Component.text("%s usage:".formatted(cmdName)).color(NamedTextColor.GOLD));
@@ -62,13 +88,28 @@ public class CMDBuilder {
         return l;
     }
 
+    /**
+     * Class for annotating command arguments.
+     */
     public static class ArgumentAnnotater {
         public final List<Supplier<String>> annotations;
 
+        /**
+         * Constructs an ArgumentAnnotater with the specified number of arguments.
+         *
+         * @param counts the number of arguments
+         */
         public ArgumentAnnotater(int counts) {
             annotations = new ArrayList<>(counts);
         }
 
+        /**
+         * Annotates the specified argument with the provided annotation supplier.
+         *
+         * @param argIndex   the index of the argument
+         * @param annotation the annotation supplier
+         * @return the ArgumentAnnotater instance
+         */
         @CanIgnoreReturnValue
         public ArgumentAnnotater annotate(int argIndex, Supplier<String> annotation) {
             while (annotations.size() <= argIndex) annotations.add(null);
@@ -76,6 +117,13 @@ public class CMDBuilder {
             return this;
         }
 
+        /**
+         * Annotates the specified argument with the provided annotation.
+         *
+         * @param argIndex   the index of the argument
+         * @param annotation the annotation
+         * @return the ArgumentAnnotater instance
+         */
         @CanIgnoreReturnValue
         public ArgumentAnnotater annotate(int argIndex, String annotation) {
             while (annotations.size() <= argIndex) annotations.add(null);
@@ -83,6 +131,12 @@ public class CMDBuilder {
             return this;
         }
 
+        /**
+         * Skips the annotation for the specified argument.
+         *
+         * @param argIndex the index of the argument
+         * @return the ArgumentAnnotater instance
+         */
         @CanIgnoreReturnValue
         public ArgumentAnnotater skipAnnotation(int argIndex) {
             while (annotations.size() <= argIndex) annotations.add(null);

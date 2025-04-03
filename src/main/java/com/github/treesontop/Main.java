@@ -16,24 +16,54 @@ import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.LightingChunk;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.timer.SchedulerManager;
+import org.beryx.textio.TextIoFactory;
 
 import java.io.InvalidObjectException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 public class Main {
+    private static final Logger logger = Logger.getLogger(Main.class.getName());
     public static MinecraftServer minecraftServer;
     public static InstanceManager instanceManager;
 
     public static Map<World, Instance> instances;
 
     public static void main(String[] args) {
+        var textio = TextIoFactory.getTextIO();
+        var terminal = textio.getTextTerminal();
+
+        logger.addHandler(new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                terminal.printf("<%s> [%s - %s]: %s%n",
+                    Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS)),
+                    record.getLevel().getName(),
+                    record.getLoggerName(),
+                    record.getMessage());
+            }
+
+            @Override
+            public void flush() {}
+            @Override
+            public void close() throws SecurityException {}
+        });
+
         connectToDB();
         startUp();
     }
+
+    /**
+     * Starts up the server and registers events and commands.
+     */
     public static void startUp() {
         startServer();
         SchedulerManager schedulerManager = MinecraftServer.getSchedulerManager();
@@ -45,40 +75,48 @@ public class Main {
 
             MojangAuth.init();
         } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error during startup", e);
             throw new RuntimeException(e);
         }
 
         minecraftServer.start("0.0.0.0", 25565);
     }
 
-
-
+    /**
+     * Connects to the database.
+     */
     public static void connectToDB() {
-        var url = "C:\\Users\\kevin\\IdeaProjects\\ForgeRPG\\TempSQLDataBase\\data.db";
-
+        var url = "jdbc:sqlite:C:/Users/kevin/IdeaProjects/ForgeRPG/TempSQLDataBase/data.db";
         try (var conn = DriverManager.getConnection(url)) {
             DataBase.setupDataBase(conn);
-
-            System.out.println("Connection to SQLite has been established.");
+            logger.info("Connection to SQLite has been established.");
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            logger.log(Level.SEVERE, "Database connection error", e);
         } catch (InvalidObjectException e) {
-            System.out.println(e.getMessage());
-            System.out.println("Yo fix yo shit");
+            logger.log(Level.SEVERE, "Database setup error", e);
             shutdownTask();
         }
     }
 
+    /**
+     * Starts the server and sets up the world.
+     */
     private static void startServer() {
         startUpProperties();
         setupWorld();
     }
 
+    /**
+     * Sets up the server properties.
+     */
     private static void startUpProperties() {
         System.setProperty("minestom.chunk-view-distance", "8");
         System.setProperty("minestom.tps", "20");
     }
 
+    /**
+     * Sets up the world instance and generator.
+     */
     private static void setupWorld() {
         instances = new HashMap<>();
         minecraftServer = MinecraftServer.init();
@@ -102,6 +140,9 @@ public class Main {
         instances.put(World.MAIN, world);
     }
 
+    /**
+     * Shuts down the server and saves user data.
+     */
     private static void shutdownTask() {
         MinecraftServer.getConnectionManager().getOnlinePlayers().forEach(player -> {
             //TODO: save user data
@@ -111,29 +152,37 @@ public class Main {
         System.exit(0);
     }
 
-
-
-    private static void registerEvent() throws Exception {
+    /**
+     * Registers events with the global event handler.
+     *
+     * @throws Exception if an error occurs during event registration
+     */
+    static void registerEvent() throws Exception {
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
 
         Set<Class<?>> v = Util.getAnnotatedClass("com.github.treesontop.events", RegisterEvent.class);
-        System.out.printf("Events to register: %d ===============%n", v.size());
+        logger.info("Events to register: " + v.size());
         for (Class<?> c : v) {
             ((EventBase<?>) c.getDeclaredConstructor().newInstance()).register(eventHandler);
-            System.out.println(c.getSimpleName() + " registered");
+            logger.info(c.getSimpleName() + " registered");
         }
     }
 
-    private static void registerCommand() throws ReflectiveOperationException {
+    /**
+     * Registers commands with the command manager.
+     *
+     * @throws ReflectiveOperationException if an error occurs during command registration
+     */
+    static void registerCommand() throws ReflectiveOperationException {
         Set<Class<?>> v = Util.getAnnotatedClass("com.github.treesontop.commands", RegisterCommand.class);
-        System.out.printf("Commands to register: %d ===============%n", v.size());
+        logger.info("Commands to register: " + v.size());
         for (Class<?> c : v) {
             switch (c.getDeclaredConstructor().newInstance()) {
                 case CMDBase c1 -> c1.register();
                 case PlayerOnlyCMDBase c2 -> c2.register();
                 default -> throw new RuntimeException("Unknown type");
             }
-            System.out.println(c.getSimpleName() + " registered");
+            logger.info(c.getSimpleName() + " registered");
         }
     }
 }

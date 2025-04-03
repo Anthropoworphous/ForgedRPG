@@ -28,6 +28,11 @@ public class CodeWriter extends PrintWriter {
         imports.put(clazz, typeReference.getImport());
         return typeReference;
     }
+    public TypeReference useType(Class<?> clazz, TypeReference... typeParam) {
+        var typeReference = new TypeReference.WithTypeParam(clazz, typeParam);
+        imports.put(clazz, typeReference.getImport());
+        return typeReference;
+    }
 
     public void printPackage() {
         printf("package %s;%n%n", pkg);

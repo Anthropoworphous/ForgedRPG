@@ -8,18 +8,36 @@ import net.minestom.server.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PlayerOnlyCMDBuilder extends CMDBuilder {
+    private static final Logger logger = Logger.getLogger(PlayerOnlyCMDBuilder.class.getName());
+
+    /**
+     * Implements a command with the provided player executor, annotation, and arguments.
+     *
+     * @param exe        the player executor
+     * @param annotation the annotation consumer
+     * @param args       the command arguments
+     * @return the PlayerOnlyCMDBuilder instance
+     */
     public PlayerOnlyCMDBuilder implement(PlayerExecutor exe, Consumer<ArgumentAnnotater> annotation, Argument<?>... args) {
         this.implement((CommandExecutor) exe, annotation, args);
         return this;
     }
+
+    /**
+     * Implements a command with the provided player executor and arguments.
+     *
+     * @param exe  the player executor
+     * @param args the command arguments
+     * @return the PlayerOnlyCMDBuilder instance
+     */
     public PlayerOnlyCMDBuilder implement(PlayerExecutor exe, Argument<?>... args) {
         this.implement((CommandExecutor) exe, args);
         return this;
     }
-
-
 
     @FunctionalInterface
     public interface PlayerExecutor extends CommandExecutor {
@@ -27,8 +45,13 @@ public class PlayerOnlyCMDBuilder extends CMDBuilder {
 
         @Override
         default void apply(@NotNull CommandSender sender, @NotNull CommandContext context) {
-            if (sender instanceof Player p) apply(p, context);
-            else sender.sendMessage("This command can only be execute by player!");
+            if (sender instanceof Player p) {
+                apply(p, context);
+            } else {
+                String errorMessage = "This command can only be executed by a player!";
+                logger.log(Level.WARNING, errorMessage);
+                sender.sendMessage(errorMessage);
+            }
         }
     }
 }

@@ -1,7 +1,10 @@
 package com.github.treesontop.codeGenerator;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 public class TypeReference {
-    private final Class<?> clazz;
+    protected final Class<?> clazz;
 
     //Use method in CodeWriter to generate TypeReference
     protected TypeReference(Class<?> clazz) {
@@ -10,9 +13,7 @@ public class TypeReference {
 
     public String literal() {
         var str = clazz.getSimpleName();
-        if (str.isBlank()) {
-            throw new RuntimeException("Unable to get name of class " + clazz);
-        }
+        if (str.isBlank()) throw new RuntimeException("Unable to get name of class " + clazz);
         return str;
     }
 
@@ -28,6 +29,32 @@ public class TypeReference {
 
     public static Void voidType() {
         return new Void();
+    }
+
+
+
+    public static class WithTypeParam extends TypeReference {
+        private final String typeParam;
+
+        protected WithTypeParam(Class<?> clazz, TypeReference... typeParam) {
+            super(clazz);
+            this.typeParam = Arrays.stream(typeParam)
+                .map(TypeReference::literal)
+                .collect(Collectors.joining(", "));
+        }
+
+        @Override
+        public String getImport() {
+            var str = clazz.getSimpleName();
+            if (str.isBlank()) throw new RuntimeException("Unable to get name of class " + clazz);
+            if (clazz.getPackageName().equals("java.lang")) return "";
+            return String.format("import %s.%s;%n", clazz.getPackageName(), str);
+        }
+
+        @Override
+        public String literal() {
+            return "%s<%s>".formatted(super.literal(), typeParam);
+        }
     }
 
 
