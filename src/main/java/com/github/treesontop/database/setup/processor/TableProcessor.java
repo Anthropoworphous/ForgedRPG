@@ -2,6 +2,7 @@ package com.github.treesontop.database.setup.processor;
 
 import com.github.treesontop.codeGenerator.*;
 import com.github.treesontop.database.Column;
+import com.github.treesontop.database.SQLData;
 import com.github.treesontop.database.SQLDataType;
 import com.github.treesontop.database.Table;
 import com.google.auto.service.AutoService;
@@ -68,6 +69,7 @@ public class TableProcessor extends AbstractProcessor {
             out.useType(Table.class);
             out.useType(Column.class);
             out.useType(SQLDataType.class);
+            out.useType(Collectors.class);
             out.useType(MakeColumn.class);
 
             var staticBlock = new CodeBlock.StaticBlock(1).append(
@@ -103,12 +105,11 @@ public class TableProcessor extends AbstractProcessor {
                 "tableMaker"
             ).append("return")
                 .append(new CodeBlock.TextBlock(2)
-                    .append(new CodeBlock.ArbitraryBlock(3)
-                        .append("CREATE TABLE IF NOT EXIST %s (".formatted(tableName))
-                        .append(sqlColumns)
-                        .append(") WITHOUT ROWID;"))));
+                    .append("CREATE TABLE IF NOT EXIST %s (".formatted(tableName))
+                    .append(sqlColumns)
+                    .append(") WITHOUT ROWID;")));
 
-            //Single Query
+            //Single query
             var columnKeyMap = columnMap.entrySet().stream()
                 .collect(Collectors.partitioningBy(
                     set -> set.getValue().config().get().PrimaryKey(),
@@ -133,17 +134,33 @@ public class TableProcessor extends AbstractProcessor {
                         new Parameter("keyValue", out.useType(Map.class, out.useType(String.class), out.useType(String.class)))
                     ).append("var statement = ")
                         .append(new CodeBlock.TextBlock(2)
-                            .append(new CodeBlock.ArbitraryBlock(3)
-                                .append("SELECT %s FROM %s".formatted(String.join(", ", columnKeyMap.get(false)), tableName))
-                                .append("WHERE %s;".formatted(columnKeyMap.get(true).stream()
-                                    .map("kv@%s@"::formatted)
-                                    .collect(Collectors.joining(" AND "))
-                                ))
-                            )
+                            .append("SELECT %s FROM %s".formatted(String.join(", ", columnKeyMap.get(false)), tableName))
+                            .append("WHERE %s;".formatted(columnKeyMap.get(true).stream()
+                                .map("kv@%s@"::formatted)
+                                .collect(Collectors.joining(" AND "))
+                            ))
                         ).append("return Pattern.compile(\"kv@(\\\\w+)@\")")
                         .append("    .matcher(statement).replaceAll(str -> str.group(1) + \" = \" + keyValue.get(str.group(1)));")
                 );
             }
+
+            classBlock.newLine();
+
+            //Insert or replace
+            classBlock.append(new Method(
+                AccessModifiers.Scope.PUBLIC.getStatic(),
+                out.useType(String.class),
+                "insertOrReplace",
+                new Parameter("columns", out.useType(Map.class, out.useType(String.class), out.useType(SQLData.class)))
+            ).append("var str = ")
+                .append(new CodeBlock.TextBlock(2)
+                    .append("REPLACE INTO %s (@column_keys@)".formatted(tableName))
+                    .append("VALUE(@column_values@)"))
+                .append("var keys = columns.keySet().stream().toList();")
+                .append("return str.replace(\"@column_keys@\", String.join(\", \", keys))")
+                .append("    .replace(\"@column_values@\", String.join(\", \", keys.stream()")
+                .append("        .map(v -> columns.get(v).sqlForm())")
+                .append("        .collect(Collectors.joining(\", \"))));"));
 
 
 

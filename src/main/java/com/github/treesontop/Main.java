@@ -4,7 +4,6 @@ import com.github.treesontop.commands.util.CMDBase;
 import com.github.treesontop.commands.util.PlayerOnlyCMDBase;
 import com.github.treesontop.commands.util.RegisterCommand;
 import com.github.treesontop.database.DataBase;
-import com.github.treesontop.database.setup.UserTable;
 import com.github.treesontop.events.EventBase;
 import com.github.treesontop.events.RegisterEvent;
 import net.minestom.server.MinecraftServer;
@@ -17,15 +16,18 @@ import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.LightingChunk;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.timer.SchedulerManager;
+import org.beryx.textio.TextIoFactory;
 
 import java.io.InvalidObjectException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 public class Main {
@@ -36,6 +38,25 @@ public class Main {
     public static Map<World, Instance> instances;
 
     public static void main(String[] args) {
+        var textio = TextIoFactory.getTextIO();
+        var terminal = textio.getTextTerminal();
+
+        logger.addHandler(new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                terminal.printf("<%s> [%s - %s]: %s%n",
+                    Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS)),
+                    record.getLevel().getName(),
+                    record.getLoggerName(),
+                    record.getMessage());
+            }
+
+            @Override
+            public void flush() {}
+            @Override
+            public void close() throws SecurityException {}
+        });
+
         connectToDB();
         startUp();
     }
@@ -66,7 +87,6 @@ public class Main {
      */
     public static void connectToDB() {
         var url = "jdbc:sqlite:C:/Users/kevin/IdeaProjects/ForgeRPG/TempSQLDataBase/data.db";
-
         try (var conn = DriverManager.getConnection(url)) {
             DataBase.setupDataBase(conn);
             logger.info("Connection to SQLite has been established.");
@@ -82,9 +102,6 @@ public class Main {
      * Starts the server and sets up the world.
      */
     private static void startServer() {
-        System.out.println(UserTable.tableMaker());
-        System.out.println(UserTable.querySingle(Collections.singleton("money"), Map.of("uuid", "e")));
-
         startUpProperties();
         setupWorld();
     }

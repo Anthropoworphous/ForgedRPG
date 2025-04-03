@@ -12,7 +12,9 @@ repositories {
 dependencies {
     implementation("net.minestom:minestom-snapshots:0366b58bfe")
     implementation("org.reflections:reflections:0.10.2")
+    implementation("org.slf4j:slf4j-nop:2.1.0-alpha1")
     implementation("org.xerial:sqlite-jdbc:3.49.1.0")
+    implementation("org.beryx:text-io:3.4.1")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.4")
     testImplementation("org.mockito:mockito-core:5.16.1")
