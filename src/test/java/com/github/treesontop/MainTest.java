@@ -12,8 +12,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.InvalidObjectException;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -43,9 +41,8 @@ public class MainTest {
     @Test
     public void testConnectToDB() {
         String url = "jdbc:sqlite:c:/Users/kevin/IdeaProjects/ForgeRPG/TempSQLDataBase/data.db";
-        try (Connection conn = DriverManager.getConnection(url)) {
-            DataBase.setupDataBase(conn);
-            assertNotNull(conn);
+        try {
+            assertNotNull(DataBase.setupDataBase(url));
         } catch (SQLException | InvalidObjectException e) {
             fail("Database connection failed");
         }

@@ -15,29 +15,20 @@ import static org.mockito.Mockito.*;
 public class DataBaseTest {
 
     private Connection connection;
+    private static final String url = "jdbc:sqlite::memory:";
 
     @BeforeEach
-    public void setUp() throws SQLException {
-        String url = "jdbc:sqlite::memory:";
-        connection = DriverManager.getConnection(url);
+    public void setUp() throws SQLException, InvalidObjectException {
+        connection = DataBase.setupDataBase(url);
     }
 
     @Test
-    public void testSetupDataBase() throws InvalidObjectException {
-        DataBase.setupDataBase(connection);
+    public void testSetupDataBase() {
         assertNotNull(connection);
     }
 
     @Test
-    public void testSetupDataBaseAlreadySetUp() throws InvalidObjectException {
-        DataBase.setupDataBase(connection);
-        InvalidObjectException exception = assertThrows(InvalidObjectException.class, () -> DataBase.setupDataBase(connection));
-        assertEquals("Database is already set up", exception.getMessage());
-    }
-
-    @Test
-    public void testGetStatement() throws InvalidObjectException, SQLException {
-        DataBase.setupDataBase(connection);
+    public void testGetStatement() throws SQLException {
         PreparedStatement statement = DataBase.getStatement("SELECT 1");
         assertNotNull(statement);
     }

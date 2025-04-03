@@ -16,7 +16,7 @@ dependencies {
     implementation("org.xerial:sqlite-jdbc:3.49.1.0")
     implementation("org.beryx:text-io:3.4.1")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.11.4")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.13.0-M2")
     testImplementation("org.mockito:mockito-core:5.16.1")
     testImplementation("org.mockito:mockito-junit-jupiter:5.16.1")
 
@@ -35,6 +35,11 @@ sourceSets {
             srcDir(layout.buildDirectory.dir("generated/sources/annotations").get().asFile)
         }
     }
+}
+
+tasks.test {
+    useJUnitPlatform()
+    useTestNG()
 }
 
 // Add a separate task for annotation processing

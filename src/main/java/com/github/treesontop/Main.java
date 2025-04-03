@@ -4,6 +4,7 @@ import com.github.treesontop.commands.util.CMDBase;
 import com.github.treesontop.commands.util.PlayerOnlyCMDBase;
 import com.github.treesontop.commands.util.RegisterCommand;
 import com.github.treesontop.database.DataBase;
+import com.github.treesontop.database.setup.UserTable;
 import com.github.treesontop.events.EventBase;
 import com.github.treesontop.events.RegisterEvent;
 import net.minestom.server.MinecraftServer;
@@ -19,18 +20,19 @@ import net.minestom.server.timer.SchedulerManager;
 import org.beryx.textio.TextIoFactory;
 
 import java.io.InvalidObjectException;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class Main {
+
     private static final Logger logger = Logger.getLogger(Main.class.getName());
     public static MinecraftServer minecraftServer;
     public static InstanceManager instanceManager;
@@ -44,11 +46,18 @@ public class Main {
         logger.addHandler(new Handler() {
             @Override
             public void publish(LogRecord record) {
-                terminal.printf("<%s> [%s - %s]: %s%n",
-                    Timestamp.from(Instant.now().truncatedTo(ChronoUnit.SECONDS)),
+                terminal.printf("[%s - %s]: %s%n",
                     record.getLevel().getName(),
-                    record.getLoggerName(),
+                    Arrays.stream(record.getLoggerName().split("\\.")).toList().getLast(),
                     record.getMessage());
+
+                var err = record.getThrown();
+
+                if (err != null) {
+                    terminal.printf(Arrays.stream(err.getStackTrace())
+                        .map(StackTraceElement::toString)
+                        .collect(Collectors.joining("%n")));
+                }
             }
 
             @Override
@@ -58,7 +67,15 @@ public class Main {
         });
 
         connectToDB();
-        startUp();
+
+        try {
+            DataBase.runStatement(UserTable.tableMaker());
+            DataBase.closeDataBase();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+//        startUp();
     }
 
     /**
@@ -87,13 +104,14 @@ public class Main {
      */
     public static void connectToDB() {
         var url = "jdbc:sqlite:C:/Users/kevin/IdeaProjects/ForgeRPG/TempSQLDataBase/data.db";
-        try (var conn = DriverManager.getConnection(url)) {
-            DataBase.setupDataBase(conn);
+        try {
+            DataBase.setupDataBase(url);
             logger.info("Connection to SQLite has been established.");
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Database connection error", e);
         } catch (InvalidObjectException e) {
             logger.log(Level.SEVERE, "Database setup error", e);
+
             shutdownTask();
         }
     }
@@ -148,6 +166,12 @@ public class Main {
             //TODO: save user data
             player.kick("Server shutting down");
         });
+
+        try {
+            DataBase.closeDataBase();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
         System.exit(0);
     }

@@ -12,9 +12,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -89,14 +87,18 @@ public class TableProcessor extends AbstractProcessor {
             classBlock.append(staticBlock);
             classBlock.newLine();
 
-            var sqlColumns = new CodeBlock.ArbitraryBlock(4);
-            columnMap.forEach((key, value) ->
-                    sqlColumns.append("%s %s %s".formatted(
-                            key.replace("_", "").toLowerCase(),
-                            value.datatype().type,
-                            value.config().get().toString()
-                    ))
-            );
+            var sqlColumns = new CodeBlock.ArbitraryBlock(2);
+            var queryColumns = new ArrayList<String>();
+            columnMap.forEach((key, value) -> queryColumns.add("%s %s %s".formatted(
+                key.replace("_", "").toLowerCase(),
+                value.datatype().type,
+                value.config().get().toString()
+            )));
+
+            for (int i = 0; i < queryColumns.size() - 1; i++) {
+                sqlColumns.append(queryColumns.get(i) + ",");
+            }
+            sqlColumns.append(queryColumns.getLast());
 
             //Table maker
             classBlock.append(new Method(
@@ -105,7 +107,7 @@ public class TableProcessor extends AbstractProcessor {
                 "tableMaker"
             ).append("return")
                 .append(new CodeBlock.TextBlock(2)
-                    .append("CREATE TABLE IF NOT EXIST %s (".formatted(tableName))
+                    .append("CREATE TABLE IF NOT EXISTS %s (".formatted(tableName))
                     .append(sqlColumns)
                     .append(") WITHOUT ROWID;")));
 
