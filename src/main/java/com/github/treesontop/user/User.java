@@ -14,7 +14,6 @@ public class User {
     @MakeColumn(datatype = SQLDataType.INT, config = MakeColumn.Config.DEFAULT)
     private int money;
 
-
     public User(Player player) {
         this.player = player;
         this.uuid = player.getUuid();

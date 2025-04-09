@@ -7,9 +7,13 @@ public enum SQLDataType {
     LONGTEXT("LONGTEXT"),
 
     //Numerical
+    BYTE("TINYINT"),
     SHORT("SMALLINT"),
     INT("INT"),
     LONG("BIGINT"),
+    U_BYTE("TINYINT UNSIGNED"),
+    U_SHORT("SMALLINT UNSIGNED"),
+    U_INT("INT UNSIGNED"),
     FLOAT("FLOAT"),
     DOUBLE("DOUBLE"),
 

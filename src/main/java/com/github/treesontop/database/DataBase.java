@@ -3,10 +3,8 @@ package com.github.treesontop.database;
 import com.github.treesontop.Main;
 
 import java.io.InvalidObjectException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.Optional;
 import java.util.logging.Logger;
 
 public class DataBase {
@@ -41,7 +39,7 @@ public class DataBase {
         return sqlConn.prepareStatement(sql);
     }
 
-    public static void runStatement(String sql) throws SQLException {
+    public static Optional<ResultSet> runStatement(String sql) throws SQLException {
         if (sqlConn == null) {
             String errorMessage = "Database connection is not set up";
             logger.severe(errorMessage);
@@ -51,6 +49,7 @@ public class DataBase {
         logger.info("Running SQL statement: ");
         logger.info(sql);
 
-        sqlConn.createStatement().execute(sql);
+        var statement = sqlConn.createStatement();
+        return statement.execute(sql) ? Optional.of(statement.getResultSet()) : Optional.empty();
     }
 }

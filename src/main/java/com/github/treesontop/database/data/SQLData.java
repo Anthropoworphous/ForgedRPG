@@ -1,10 +1,10 @@
-package com.github.treesontop.database;
+package com.github.treesontop.database.data;
 
-import java.util.Objects;
+import com.github.treesontop.database.SQLDataType;
 
 public abstract class SQLData {
     public final SQLDataType dataType;
-    public final Object value;
+    protected final Object value;
 
     public SQLData(SQLDataType dataType, Object value) {
         this.dataType = dataType;

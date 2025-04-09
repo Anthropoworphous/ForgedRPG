@@ -2,7 +2,7 @@ package com.github.treesontop.database.setup.processor;
 
 import com.github.treesontop.codeGenerator.*;
 import com.github.treesontop.database.Column;
-import com.github.treesontop.database.SQLData;
+import com.github.treesontop.database.data.SQLData;
 import com.github.treesontop.database.SQLDataType;
 import com.github.treesontop.database.Table;
 import com.google.auto.service.AutoService;
@@ -70,6 +70,8 @@ public class TableProcessor extends AbstractProcessor {
             out.useType(Collectors.class);
             out.useType(MakeColumn.class);
 
+            var strType = out.useType(String.class);
+
             var staticBlock = new CodeBlock.StaticBlock(1).append(
                     "var bdr = new Table.Builder(\"%s\");".formatted(tableName)
             );
@@ -87,6 +89,11 @@ public class TableProcessor extends AbstractProcessor {
             classBlock.append(staticBlock);
             classBlock.newLine();
 
+
+
+
+
+
             var sqlColumns = new CodeBlock.ArbitraryBlock(2);
             var queryColumns = new ArrayList<String>();
             columnMap.forEach((key, value) -> queryColumns.add("%s %s %s".formatted(
@@ -103,7 +110,7 @@ public class TableProcessor extends AbstractProcessor {
             //Table maker
             classBlock.append(new Method(
                 AccessModifiers.Scope.PUBLIC.getStatic(),
-                out.useType(String.class),
+                strType,
                 "tableMaker"
             ).append("return")
                 .append(new CodeBlock.TextBlock(2)
@@ -130,10 +137,10 @@ public class TableProcessor extends AbstractProcessor {
 
                 classBlock.append(new Method(
                         AccessModifiers.Scope.PUBLIC.getStatic(),
-                        out.useType(String.class),
+                        strType,
                         "querySingle",
-                        new Parameter("queryColumn", out.useType(Set.class, out.useType(String.class))),
-                        new Parameter("keyValue", out.useType(Map.class, out.useType(String.class), out.useType(String.class)))
+                        new Parameter("queryColumn", out.useType(Set.class, strType)),
+                        new Parameter("keyValue", out.useType(Map.class, strType,  out.useType(SQLData.class)))
                     ).append("var statement = ")
                         .append(new CodeBlock.TextBlock(2)
                             .append("SELECT %s FROM %s".formatted(String.join(", ", columnKeyMap.get(false)), tableName))
@@ -142,7 +149,7 @@ public class TableProcessor extends AbstractProcessor {
                                 .collect(Collectors.joining(" AND "))
                             ))
                         ).append("return Pattern.compile(\"kv@(\\\\w+)@\")")
-                        .append("    .matcher(statement).replaceAll(str -> str.group(1) + \" = \" + keyValue.get(str.group(1)));")
+                        .append("    .matcher(statement).replaceAll(str -> str.group(1) + \" = \" + keyValue.get(str.group(1)).sqlForm());")
                 );
             }
 
@@ -151,20 +158,18 @@ public class TableProcessor extends AbstractProcessor {
             //Insert or replace
             classBlock.append(new Method(
                 AccessModifiers.Scope.PUBLIC.getStatic(),
-                out.useType(String.class),
+                strType,
                 "insertOrReplace",
-                new Parameter("columns", out.useType(Map.class, out.useType(String.class), out.useType(SQLData.class)))
+                new Parameter("columns", out.useType(Map.class, strType, out.useType(SQLData.class)))
             ).append("var str = ")
                 .append(new CodeBlock.TextBlock(2)
                     .append("REPLACE INTO %s (@column_keys@)".formatted(tableName))
-                    .append("VALUE(@column_values@)"))
+                    .append("VALUES(@column_values@)"))
                 .append("var keys = columns.keySet().stream().toList();")
                 .append("return str.replace(\"@column_keys@\", String.join(\", \", keys))")
                 .append("    .replace(\"@column_values@\", String.join(\", \", keys.stream()")
                 .append("        .map(v -> columns.get(v).sqlForm())")
-                .append("        .collect(Collectors.joining(\", \"))));"));
-
-
+                .append("        .collect(Collectors.joining(\", \")))) + ';';"));
 
             out.printPackage();
             out.printImport();

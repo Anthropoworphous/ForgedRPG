@@ -4,6 +4,10 @@ import com.github.treesontop.commands.util.CMDBase;
 import com.github.treesontop.commands.util.PlayerOnlyCMDBase;
 import com.github.treesontop.commands.util.RegisterCommand;
 import com.github.treesontop.database.DataBase;
+import com.github.treesontop.database.SQLDataType;
+import com.github.treesontop.database.data.SQLInt;
+import com.github.treesontop.database.data.SQLText;
+//import com.github.treesontop.database.setup.UserTable;
 import com.github.treesontop.database.setup.UserTable;
 import com.github.treesontop.events.EventBase;
 import com.github.treesontop.events.RegisterEvent;
@@ -21,10 +25,7 @@ import org.beryx.textio.TextIoFactory;
 
 import java.io.InvalidObjectException;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -70,6 +71,20 @@ public class Main {
 
         try {
             DataBase.runStatement(UserTable.tableMaker());
+            DataBase.runStatement(UserTable.insertOrReplace(Map.of(
+                "money", new SQLInt(SQLDataType.INT, 69),
+                    "uuid", new SQLText(SQLDataType.TINYTEXT, "TEST")
+                )));
+            var q = DataBase.runStatement(UserTable.querySingle(Collections.singleton("money"), Map.of("uuid", new SQLText(SQLDataType.TINYTEXT, "TEST"))));
+
+            q.ifPresent(result -> {
+                try {
+                    logger.info(String.valueOf(result.getInt("money")));
+                } catch (SQLException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
             DataBase.closeDataBase();
         } catch (SQLException e) {
             throw new RuntimeException(e);
