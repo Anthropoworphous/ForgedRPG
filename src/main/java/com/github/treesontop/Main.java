@@ -4,14 +4,10 @@ import com.github.treesontop.commands.util.CMDBase;
 import com.github.treesontop.commands.util.PlayerOnlyCMDBase;
 import com.github.treesontop.commands.util.RegisterCommand;
 import com.github.treesontop.database.DataBase;
-import com.github.treesontop.database.SQLDataType;
-import com.github.treesontop.database.data.SQLInt;
-import com.github.treesontop.database.data.SQLText;
-//import com.github.treesontop.database.setup.UserTable;
-import com.github.treesontop.database.setup.UserTable;
 import com.github.treesontop.events.EventBase;
 import com.github.treesontop.events.RegisterEvent;
 import net.minestom.server.MinecraftServer;
+import net.minestom.server.command.CommandManager;
 import net.minestom.server.coordinate.Vec;
 import net.minestom.server.event.GlobalEventHandler;
 import net.minestom.server.extras.MojangAuth;
@@ -25,7 +21,10 @@ import org.beryx.textio.TextIoFactory;
 
 import java.io.InvalidObjectException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -69,41 +68,22 @@ public class Main {
 
         connectToDB();
 
-        try {
-            DataBase.runStatement(UserTable.tableMaker());
-            DataBase.runStatement(UserTable.insertOrReplace(Map.of(
-                "money", new SQLInt(SQLDataType.INT, 69),
-                    "uuid", new SQLText(SQLDataType.TINYTEXT, "TEST")
-                )));
-            var q = DataBase.runStatement(UserTable.querySingle(Collections.singleton("money"), Map.of("uuid", new SQLText(SQLDataType.TINYTEXT, "TEST"))));
-
-            q.ifPresent(result -> {
-                try {
-                    logger.info(String.valueOf(result.getInt("money")));
-                } catch (SQLException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-
-            DataBase.closeDataBase();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-//        startUp();
+        startUp(minecraftServer);
     }
 
     /**
      * Starts up the server and registers events and commands.
      */
-    public static void startUp() {
+    public static void startUp(MinecraftServer minecraftServer) {
         startServer();
         SchedulerManager schedulerManager = MinecraftServer.getSchedulerManager();
-        schedulerManager.buildShutdownTask(Main::shutdownTask);
+        schedulerManager.buildShutdownTask(Main::shutdown);
 
         try {
-            registerEvent();
-            registerCommand();
+            registerEvent(Util.getAnnotatedClass("com.github.treesontop.events", RegisterEvent.class),
+                MinecraftServer.getGlobalEventHandler());
+            registerCommand(Util.getAnnotatedClass("com.github.treesontop.commands", RegisterCommand.class),
+                MinecraftServer.getCommandManager());
 
             MojangAuth.init();
         } catch (Exception e) {
@@ -127,7 +107,7 @@ public class Main {
         } catch (InvalidObjectException e) {
             logger.log(Level.SEVERE, "Database setup error", e);
 
-            shutdownTask();
+            shutdown();
         }
     }
 
@@ -176,7 +156,7 @@ public class Main {
     /**
      * Shuts down the server and saves user data.
      */
-    private static void shutdownTask() {
+    public static void shutdown() {
         MinecraftServer.getConnectionManager().getOnlinePlayers().forEach(player -> {
             //TODO: save user data
             player.kick("Server shutting down");
@@ -186,6 +166,8 @@ public class Main {
             DataBase.closeDataBase();
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } catch (NullPointerException e) {
+            logger.info("No database were connected");
         }
 
         System.exit(0);
@@ -196,12 +178,9 @@ public class Main {
      *
      * @throws Exception if an error occurs during event registration
      */
-    static void registerEvent() throws Exception {
-        GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-
-        Set<Class<?>> v = Util.getAnnotatedClass("com.github.treesontop.events", RegisterEvent.class);
-        logger.info("Events to register: " + v.size());
-        for (Class<?> c : v) {
+    static void registerEvent(Set<Class<?>> classes, GlobalEventHandler eventHandler) throws Exception {
+        logger.info("Events to register: " + classes.size());
+        for (Class<?> c : classes) {
             ((EventBase<?>) c.getDeclaredConstructor().newInstance()).register(eventHandler);
             logger.info(c.getSimpleName() + " registered");
         }
@@ -212,13 +191,12 @@ public class Main {
      *
      * @throws ReflectiveOperationException if an error occurs during command registration
      */
-    static void registerCommand() throws ReflectiveOperationException {
-        Set<Class<?>> v = Util.getAnnotatedClass("com.github.treesontop.commands", RegisterCommand.class);
-        logger.info("Commands to register: " + v.size());
-        for (Class<?> c : v) {
+    static void registerCommand(Set<Class<?>> classes, CommandManager commandManager) throws ReflectiveOperationException {
+        logger.info("Commands to register: " + classes.size());
+        for (Class<?> c : classes) {
             switch (c.getDeclaredConstructor().newInstance()) {
-                case CMDBase c1 -> c1.register();
-                case PlayerOnlyCMDBase c2 -> c2.register();
+                case CMDBase c1 -> c1.register(commandManager);
+                case PlayerOnlyCMDBase c2 -> c2.register(commandManager);
                 default -> throw new RuntimeException("Unknown type");
             }
             logger.info(c.getSimpleName() + " registered");

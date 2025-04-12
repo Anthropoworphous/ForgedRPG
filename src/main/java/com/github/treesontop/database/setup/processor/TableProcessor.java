@@ -53,6 +53,14 @@ public class TableProcessor extends AbstractProcessor {
         String tableName = className.toLowerCase(); //for use in SQL
 
         try (CodeWriter out = new CodeWriter(processingEnv, "com.github.treesontop.database.setup", tableClassName)) {
+            out.useType(Column.class);
+            out.useType(SQLDataType.class);
+            out.useType(Collectors.class);
+            out.useType(MakeColumn.class);
+
+            var strType = out.useType(String.class);
+            var tableType = out.useType(Table.class);
+
             var classBlock = new ClassBlock(AccessModifiers.Scope.PUBLIC.get(),
                 tableClassName,
                 0,
@@ -60,25 +68,18 @@ public class TableProcessor extends AbstractProcessor {
 
             classBlock.append(new Field(
                     AccessModifiers.Scope.PUBLIC.getStatic(),
-                    new Parameter("table", out.useType(Table.class)))
-            );
-            classBlock.newLine();
+                    new Parameter("table", tableType))
+            ).newLine();
 
-            out.useType(Table.class);
-            out.useType(Column.class);
-            out.useType(SQLDataType.class);
-            out.useType(Collectors.class);
-            out.useType(MakeColumn.class);
-
-            var strType = out.useType(String.class);
 
             var staticBlock = new CodeBlock.StaticBlock(1).append(
                     "var bdr = new Table.Builder(\"%s\");".formatted(tableName)
             );
 
             columnMap.forEach((name, data) -> staticBlock.append(
-                    "bdr.insertColumn(\"%s\", new Column(SQLDataType.%s, MakeColumn.Config.%s.get()));".formatted(
+                    "bdr.insertColumn(\"%s\", new Column(\"%s\", SQLDataType.%s, MakeColumn.Config.%s.get()));".formatted(
                             name.replace("_", "").toLowerCase(),
+                            tableClassName,
                             data.datatype(),
                             data.config().name()
                     ))
@@ -88,11 +89,6 @@ public class TableProcessor extends AbstractProcessor {
 
             classBlock.append(staticBlock);
             classBlock.newLine();
-
-
-
-
-
 
             var sqlColumns = new CodeBlock.ArbitraryBlock(2);
             var queryColumns = new ArrayList<String>();

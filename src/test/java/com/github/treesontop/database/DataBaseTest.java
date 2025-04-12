@@ -5,20 +5,19 @@ import org.junit.jupiter.api.Test;
 
 import java.io.InvalidObjectException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class DataBaseTest {
-
     private Connection connection;
-    private static final String url = "jdbc:sqlite::memory:";
 
     @BeforeEach
     public void setUp() throws SQLException, InvalidObjectException {
+        String url = "jdbc:sqlite::memory:";
+        DataBase.closeDataBase();
+        DataBase.wipeConnection();
         connection = DataBase.setupDataBase(url);
     }
 
@@ -34,7 +33,9 @@ public class DataBaseTest {
     }
 
     @Test
-    public void testGetStatementWithoutSetup() {
+    public void testGetStatementWithoutSetup() throws SQLException {
+        DataBase.closeDataBase();
+        DataBase.wipeConnection();
         SQLException exception = assertThrows(SQLException.class, () -> DataBase.getStatement("SELECT 1"));
         assertEquals("Database connection is not set up", exception.getMessage());
     }

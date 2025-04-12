@@ -27,7 +27,15 @@ public class DataBase {
     }
 
     public static void closeDataBase() throws SQLException {
-        sqlConn.close();
+        if (sqlConn == null) {
+            logger.info("Database connection is not set up");
+        } else {
+            sqlConn.close();
+        }
+    }
+
+    public static void wipeConnection() {
+        sqlConn = null;
     }
 
     public static PreparedStatement getStatement(String sql) throws SQLException {

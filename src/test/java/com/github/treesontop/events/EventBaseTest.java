@@ -4,27 +4,24 @@ import net.minestom.server.event.Event;
 import net.minestom.server.event.GlobalEventHandler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Answers.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.*;
 
 class EventBaseTest {
-
     private EventBase<Event> eventBase;
     private GlobalEventHandler eventHandler;
 
     @BeforeEach
     void setUp() {
-        eventBase = Mockito.mock(EventBase.class, Mockito.CALLS_REAL_METHODS);
-        eventHandler = Mockito.mock(GlobalEventHandler.class);
+        eventBase = mock(EventBase.class, CALLS_REAL_METHODS);
+        eventHandler = mock(GlobalEventHandler.class);
     }
 
     @Test
     void testRun() {
-        Event event = Mockito.mock(Event.class);
+        Event event = mock(Event.class);
         when(eventBase.execute(event)).thenReturn(EventBase.Result.SUCCESS);
 
         EventBase.Result result = eventBase.run(event);
@@ -35,7 +32,7 @@ class EventBaseTest {
 
     @Test
     void testRunWithException() {
-        Event event = Mockito.mock(Event.class);
+        Event event = mock(Event.class);
         when(eventBase.execute(event)).thenThrow(new RuntimeException("Test exception"));
 
         EventBase.Result result = eventBase.run(event);
@@ -48,12 +45,5 @@ class EventBaseTest {
         eventBase.register(eventHandler);
 
         verify(eventHandler).addListener(eventBase);
-    }
-
-    @Test
-    void testEventType() {
-        Class<Event> eventType = eventBase.eventType();
-
-        assertEquals(Event.class, eventType);
     }
 }

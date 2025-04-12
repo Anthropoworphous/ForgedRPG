@@ -1,48 +1,49 @@
 package com.github.treesontop;
 
-import com.github.treesontop.commands.util.CMDBase;
-import com.github.treesontop.commands.util.PlayerOnlyCMDBase;
 import com.github.treesontop.commands.util.RegisterCommand;
 import com.github.treesontop.database.DataBase;
-import com.github.treesontop.events.EventBase;
 import com.github.treesontop.events.RegisterEvent;
 import net.minestom.server.MinecraftServer;
-import net.minestom.server.instance.InstanceManager;
-import org.junit.jupiter.api.BeforeEach;
+import net.minestom.server.command.CommandManager;
+import net.minestom.server.command.builder.Command;
+import net.minestom.server.event.GlobalEventHandler;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.io.InvalidObjectException;
+import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Set;
-import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 
 public class MainTest {
-    private MinecraftServer minecraftServer;
-    private InstanceManager instanceManager;
-    private Logger logger;
+    private static MinecraftServer minecraftServer;
+    private static GlobalEventHandler eventHandler;
+    private static CommandManager commandManager;
 
-    @BeforeEach
-    public void setUp() {
+    @BeforeAll
+    public static void setUp() {
         minecraftServer = mock(MinecraftServer.class);
-        instanceManager = mock(InstanceManager.class);
-        logger = mock(Logger.class);
+        eventHandler = mock(GlobalEventHandler.class);
+        commandManager = mock(CommandManager.class);
     }
 
     @Test
     public void testStartUp() {
-        Main.startUp();
+        Main.startUp(minecraftServer);
         verify(minecraftServer, times(1)).start("0.0.0.0", 25565);
     }
 
     @Test
+    @Order(1)
     public void testConnectToDB() {
-        String url = "jdbc:sqlite:c:/Users/kevin/IdeaProjects/ForgeRPG/TempSQLDataBase/data.db";
+        String url = "jdbc:sqlite:c:/Users/kevin/IdeaProjects/ForgeRPG/TempSQLDataBase/test/data.db";
         try {
-            assertNotNull(DataBase.setupDataBase(url));
+            Connection conn = DataBase.setupDataBase(url);
+            assertNotNull(conn);
         } catch (SQLException | InvalidObjectException e) {
             fail("Database connection failed");
         }
@@ -50,27 +51,42 @@ public class MainTest {
 
     @Test
     public void testRegisterEvent() throws Exception {
-        Set<Class<?>> eventClasses = Set.of(EventBase.class);
-        when(Util.getAnnotatedClass("com.github.treesontop.events", RegisterEvent.class)).thenReturn(eventClasses);
-
-        Main.registerEvent();
-
-        verify(logger, times(1)).info("Events to register: " + eventClasses.size());
-        for (Class<?> eventClass : eventClasses) {
-            verify(logger, times(1)).info(eventClass.getSimpleName() + " registered");
-        }
+        var classes = Util.getAnnotatedClass("com.github.treesontop.events", RegisterEvent.class);
+        Main.registerEvent(classes, eventHandler);
+        verify(eventHandler, times(classes.size())).addListener(any());
     }
 
     @Test
     public void testRegisterCommand() throws ReflectiveOperationException {
-        Set<Class<?>> commandClasses = Set.of(CMDBase.class, PlayerOnlyCMDBase.class);
-        when(Util.getAnnotatedClass("com.github.treesontop.commands", RegisterCommand.class)).thenReturn(commandClasses);
+        var classes = Util.getAnnotatedClass("com.github.treesontop.commands", RegisterCommand.class);
 
-        Main.registerCommand();
+        Main.registerCommand(classes, commandManager);
 
-        verify(logger, times(1)).info("Commands to register: " + commandClasses.size());
-        for (Class<?> commandClass : commandClasses) {
-            verify(logger, times(1)).info(commandClass.getSimpleName() + " registered");
-        }
+        verify(commandManager, times(classes.size())).register(any(Command.class));
+    }
+
+    @Test
+    @Order(2)
+    public void testDataBase() {
+//        try {
+//            DataBase.runStatement(UserTable.tableMaker());
+//            DataBase.runStatement(UserTable.insertOrReplace(Map.of(
+//                "money", new SQLInt(SQLDataType.INT, 69),
+//                    "uuid", new SQLText(SQLDataType.TINYTEXT, "TEST")
+//                )));
+//            var q = DataBase.runStatement(UserTable.querySingle(Collections.singleton("money"), Map.of("uuid", new SQLText(SQLDataType.TINYTEXT, "TEST"))));
+//
+//            q.ifPresent(result -> {
+//                try {
+//                    logger.info(String.valueOf(result.getInt("money")));
+//                } catch (SQLException e) {
+//                    throw new RuntimeException(e);
+//                }
+//            });
+//
+//            DataBase.closeDataBase();
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 }

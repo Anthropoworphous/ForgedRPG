@@ -1,18 +1,17 @@
 package com.github.treesontop.commands.util;
 
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
 import net.minestom.server.command.builder.Command;
+
 import java.util.logging.Logger;
 
 public abstract class CMDBase {
-    private static final CommandManager cmdManager = MinecraftServer.getCommandManager();
     private static final Logger logger = Logger.getLogger(CMDBase.class.getName());
 
     /**
      * Registers the command with the command manager.
      */
-    public void register() {
+    public void register(CommandManager cmdManager) {
         Command cmd = extractBaseCommand();
         CMDBuilder builder = new CMDBuilder();
         build(builder);
@@ -21,12 +20,13 @@ public abstract class CMDBase {
             cmd.addSyntax(builder.executor.get(i), builder.argList.get(i));
 
             int finalI = i;
-            cmd.setDefaultExecutor((sender, ignore) -> builder.generateArgsDescription(cmd.getName(), finalI)
-                    .forEach(sender::sendMessage));
+            cmd.setDefaultExecutor((sender, ignore) -> builder
+                .generateArgsDescription(cmd.getName(), finalI)
+                .forEach(sender::sendMessage));
         }
 
-        // Log the command syntaxes tree
-        logger.info(cmd.getSyntaxesTree().toString());
+        //noinspection UnstableApiUsage
+        logger.info(cmd.getSyntaxesTree());
 
         cmdManager.register(cmd);
     }

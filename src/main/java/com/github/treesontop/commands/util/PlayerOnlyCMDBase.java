@@ -1,19 +1,18 @@
 package com.github.treesontop.commands.util;
 
-import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
 import net.minestom.server.command.builder.Command;
 import net.minestom.server.command.builder.arguments.Argument;
+
 import java.util.logging.Logger;
 
 public abstract class PlayerOnlyCMDBase {
-    private static final CommandManager cmdManager = MinecraftServer.getCommandManager();
     private static final Logger logger = Logger.getLogger(PlayerOnlyCMDBase.class.getName());
 
     /**
      * Registers the command with the command manager.
      */
-    public void register() {
+    public void register(CommandManager cmdManager) {
         Command cmd = extractBaseCommand();
         PlayerOnlyCMDBuilder builder = new PlayerOnlyCMDBuilder();
         build(builder);
@@ -28,8 +27,8 @@ public abstract class PlayerOnlyCMDBase {
                     .forEach(sender::sendMessage));
         }
 
-        // Log the command syntaxes tree
-        logger.info(cmd.getSyntaxesTree().toString());
+        //noinspection UnstableApiUsage
+        logger.info(cmd.getSyntaxesTree());
 
         cmdManager.register(cmd);
     }

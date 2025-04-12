@@ -14,8 +14,9 @@ public final class Method extends CodeBlock {
             .collect(Collectors.joining(", ")));
     }
 
-    public void isOverride() {
+    public Method isOverride() {
         isOverride = true;
+        return this;
     }
 
     @Override
