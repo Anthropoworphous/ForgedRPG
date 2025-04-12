@@ -20,6 +20,8 @@ dependencies {
     testImplementation("org.mockito:mockito-core:5.16.1")
     testImplementation("org.mockito:mockito-junit-jupiter:5.16.1")
 
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
     // Annotation processor dependencies
     compileOnly("com.google.auto.service:auto-service-annotations:1.1.1")
     annotationProcessor("com.google.auto.service:auto-service:1.1.1")
@@ -37,12 +39,11 @@ sourceSets {
     }
 }
 
-tasks.test {
+tasks.named<Test>("test") {
+    jvmArgs("-XX:+EnableDynamicAgentLoading")
     useJUnitPlatform()
-    useTestNG()
 }
 
-// Add a separate task for annotation processing
 tasks.register<JavaCompile>("processAnnotations") {
     source = sourceSets.main.get().java.sourceDirectories.asFileTree
     classpath = configurations.compileClasspath.get()
@@ -60,4 +61,22 @@ tasks.register<JavaCompile>("processAnnotations") {
 tasks.compileJava {
     dependsOn("processAnnotations")
     source(fileTree(layout.buildDirectory.dir("generated/sources/annotations").get().asFile))
+
+    options.compilerArgs.add("-Xlint:unchecked")
+}
+
+tasks.register<JavaCompile>("annotationsPostProcess") {
+    dependsOn(tasks.compileJava)
+
+    source = sourceSets.main.get().java.sourceDirectories.asFileTree
+    classpath = configurations.compileClasspath.get()
+    destinationDirectory.set(layout.buildDirectory.dir("generated/sources/annotations"))
+
+    // Use Java 21
+    sourceCompatibility = "21"
+    targetCompatibility = "21"
+
+    options.annotationProcessorPath = configurations.annotationProcessor.get()
+    options.compilerArgs.add("-proc:only")  // Only process annotations
+    options.setIncremental(true)
 }
