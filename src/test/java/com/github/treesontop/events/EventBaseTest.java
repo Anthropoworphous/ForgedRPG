@@ -15,7 +15,8 @@ class EventBaseTest {
 
     @BeforeEach
     void setUp() {
-        eventBase = mock(EventBase.class, CALLS_REAL_METHODS);
+        //noinspection unchecked
+        eventBase = (EventBase<Event>) mock(EventBase.class, CALLS_REAL_METHODS);
         eventHandler = mock(GlobalEventHandler.class);
     }
 
