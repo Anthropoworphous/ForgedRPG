@@ -4,8 +4,10 @@ import com.github.treesontop.commands.util.CMDBase;
 import com.github.treesontop.commands.util.PlayerOnlyCMDBase;
 import com.github.treesontop.commands.util.RegisterCommand;
 import com.github.treesontop.database.DataBase;
+import com.github.treesontop.database.generator.TableGenerator;
 import com.github.treesontop.events.EventBase;
 import com.github.treesontop.events.RegisterEvent;
+import com.github.treesontop.user.User;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
 import net.minestom.server.coordinate.Vec;
@@ -19,7 +21,6 @@ import net.minestom.server.instance.block.Block;
 import net.minestom.server.timer.SchedulerManager;
 import org.beryx.textio.TextIoFactory;
 
-import java.io.InvalidObjectException;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,7 +33,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class Main {
-
     private static final Logger logger = Logger.getLogger(Main.class.getName());
     public static MinecraftServer minecraftServer;
     public static InstanceManager instanceManager;
@@ -66,7 +66,9 @@ public class Main {
             public void close() throws SecurityException {}
         });
 
-        connectToDB();
+        DataBase.connectToDB();
+
+        TableGenerator.generate();
 
         startUp(minecraftServer);
     }
@@ -94,22 +96,6 @@ public class Main {
         minecraftServer.start("0.0.0.0", 25565);
     }
 
-    /**
-     * Connects to the database.
-     */
-    public static void connectToDB() {
-        var url = "jdbc:sqlite:C:/Users/kevin/IdeaProjects/ForgeRPG/TempSQLDataBase/data.db";
-        try {
-            DataBase.setupDataBase(url);
-            logger.info("Connection to SQLite has been established.");
-        } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Database connection error", e);
-        } catch (InvalidObjectException e) {
-            logger.log(Level.SEVERE, "Database setup error", e);
-
-            shutdown();
-        }
-    }
 
     /**
      * Starts the server and sets up the world.
@@ -158,7 +144,11 @@ public class Main {
      */
     public static void shutdown() {
         MinecraftServer.getConnectionManager().getOnlinePlayers().forEach(player -> {
-            //TODO: save user data
+            try {
+                User.save(player);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
             player.kick("Server shutting down");
         });
 

@@ -14,6 +14,11 @@ public class Util {
             .collect(Collectors.toSet());
     }
 
+    public static String capFirst(String str) {
+        if (str.length() <= 1) throw new RuntimeException(str + " is too short!");
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
     public @interface DoNotScan {}

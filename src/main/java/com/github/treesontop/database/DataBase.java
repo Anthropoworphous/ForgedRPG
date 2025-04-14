@@ -5,6 +5,7 @@ import com.github.treesontop.Main;
 import java.io.InvalidObjectException;
 import java.sql.*;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DataBase {
@@ -13,6 +14,19 @@ public class DataBase {
 
     static {
         logger.setParent(Logger.getLogger(Main.class.getName()));
+    }
+
+    public static void connectToDB() {
+        var url = "jdbc:sqlite:C:/Users/kevin/IdeaProjects/ForgeRPG/TempSQLDataBase/data.db";
+        try {
+            DataBase.setupDataBase(url);
+            logger.info("Connection to SQLite has been established.");
+        } catch (SQLException e) {
+            logger.log(Level.SEVERE, "Database connection error", e);
+        } catch (InvalidObjectException e) {
+            logger.log(Level.SEVERE, "Database setup error", e);
+            throw new RuntimeException(e);
+        }
     }
 
     public static Connection setupDataBase(String url) throws InvalidObjectException, SQLException {
