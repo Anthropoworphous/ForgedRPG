@@ -6,7 +6,7 @@ import net.minestom.server.command.builder.Command;
 import java.util.logging.Logger;
 
 public abstract class CMDBase {
-    private static final Logger logger = Logger.getLogger(CMDBase.class.getName());
+    private static final Logger logger = Logger.getGlobal();
 
     /**
      * Registers the command with the command manager.

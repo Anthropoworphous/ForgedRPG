@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class Main {
-    private static final Logger logger = Logger.getLogger(Main.class.getName());
+    private static final Logger logger = Logger.getGlobal();
     public static MinecraftServer minecraftServer;
     public static InstanceManager instanceManager;
 
@@ -43,7 +43,7 @@ public class Main {
         var textio = TextIoFactory.getTextIO();
         var terminal = textio.getTextTerminal();
 
-        logger.addHandler(new Handler() {
+        Logger.getGlobal().addHandler(new Handler() {
             @Override
             public void publish(LogRecord record) {
                 terminal.printf("[%s - %s]: %s%n",
@@ -70,7 +70,7 @@ public class Main {
 
         TableGenerator.generate();
 
-        startUp(minecraftServer);
+        startUp(minecraftServer = MinecraftServer.init());
     }
 
     /**
@@ -94,6 +94,8 @@ public class Main {
         }
 
         minecraftServer.start("0.0.0.0", 25565);
+
+        logger.info("Server started!");
     }
 
 

@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DataBase {
-    private static final Logger logger = Logger.getLogger(DataBase.class.getName());
+    private static final Logger logger = Logger.getGlobal();
     private static Connection sqlConn;
 
     static {

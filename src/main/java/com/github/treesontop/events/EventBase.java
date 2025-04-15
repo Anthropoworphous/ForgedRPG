@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 
 @SuppressWarnings("unchecked")
 public abstract class EventBase<E extends Event> implements EventListener<E> {
-    private static final Logger logger = Logger.getLogger(EventBase.class.getName());
+    private static final Logger logger = Logger.getGlobal();
 
     /**
      * Executes the event.

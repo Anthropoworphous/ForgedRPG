@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 
 import java.io.InvalidObjectException;
-import java.sql.Connection;
 import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -40,9 +39,10 @@ public class MainTest {
     @Test
     @Order(1)
     public void testConnectToDB() {
-        String url = "jdbc:sqlite:c:/Users/kevin/IdeaProjects/ForgeRPG/TempSQLDataBase/test/data.db";
         try {
-            Connection conn = DataBase.setupDataBase(url);
+            DataBase.closeDataBase();
+            DataBase.wipeConnection();
+            var conn = DataBase.setupDataBase("jdbc:sqlite::memory:");
             assertNotNull(conn);
         } catch (SQLException | InvalidObjectException e) {
             fail("Database connection failed");

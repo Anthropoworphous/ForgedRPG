@@ -38,17 +38,22 @@ public class SQLCreateTable implements SQLStatement {
         str.append(table.name).append(" (\n");
 
         var columnStr = new ArrayList<String>();
+        addColumn(columnStr, table.key());
         for (Column column : table.columns()) {
-            columnStr.add("    %s %s %s".formatted(
-                column.name,
-                column.dataType.toString(),
-                column.config().toString()
-            ));
+            addColumn(columnStr, column);
         }
         str.append(String.join(",\n", columnStr)).append("\n)");
 
         if (withoutRowID) str.append(" WITHOUT ROWID");
 
         return str.toString() + ';';
+    }
+
+    private void addColumn(ArrayList<String> list, Column column) {
+        list.add("    %s %s %s".formatted(
+            column.name,
+            column.dataType.toString(),
+            column.config().toString()
+        ));
     }
 }

@@ -1,6 +1,8 @@
 package com.github.treesontop;
 
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanner;
+import org.reflections.scanners.Scanners;
 
 import java.lang.annotation.*;
 import java.util.Set;

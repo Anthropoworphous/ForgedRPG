@@ -7,7 +7,7 @@ import net.minestom.server.command.builder.arguments.Argument;
 import java.util.logging.Logger;
 
 public abstract class PlayerOnlyCMDBase {
-    private static final Logger logger = Logger.getLogger(PlayerOnlyCMDBase.class.getName());
+    private static final Logger logger = Logger.getGlobal();
 
     /**
      * Registers the command with the command manager.

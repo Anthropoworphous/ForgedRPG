@@ -12,7 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class PlayerOnlyCMDBuilder extends CMDBuilder {
-    private static final Logger logger = Logger.getLogger(PlayerOnlyCMDBuilder.class.getName());
+    private static final Logger logger = Logger.getGlobal();
 
     /**
      * Implements a command with the provided player executor, annotation, and arguments.

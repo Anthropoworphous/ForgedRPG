@@ -20,6 +20,8 @@ class SQLCreateTableTest {
 
     @BeforeAll
     static void init() throws SQLException, InvalidObjectException {
+        DataBase.closeDataBase();
+        DataBase.wipeConnection();
         connection = DataBase.setupDataBase("jdbc:sqlite::memory:");
     }
 

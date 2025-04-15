@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CMDBuilder {
-    private static final Logger logger = Logger.getLogger(CMDBuilder.class.getName());
+    private static final Logger logger = Logger.getGlobal();
 
     byte counts = 0;
     final List<CommandExecutor> executor = new ArrayList<>();

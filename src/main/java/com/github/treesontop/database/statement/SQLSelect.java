@@ -43,24 +43,23 @@ public class SQLSelect implements SQLStatement, SQLGroup {
 
     @Override
     public String compile() {
-        var sql = "SELECT %s%nFROM %s%n".formatted(
+        var sql = "SELECT %s%nFROM %s".formatted(
             values.isEmpty() ? "*" : values.stream().map(SQLValue::toString).collect(Collectors.joining(", ")),
             tables.stream().map(table -> table.name).collect(Collectors.joining(", "))
         );
         if (!tableLinks.isEmpty()) sql += tableLinks.stream()
-            .map(sqlTableLink -> sqlTableLink.toString() + "\n")
-            .collect(Collectors.joining());
-        if (condition != null) sql += condition + "\n";
+            .map(SQLTableLink::toString)
+            .collect(Collectors.joining("\n"));
+        if (condition != null) sql += "\n" + condition;
         if (orderBy != null) {
             if (!orderBy.valueCheck(values)) throw new RuntimeException("Order by value is not in the list");
-            sql += orderBy.toString() + "\n";
+            sql += "\n" + orderBy.toString();
         }
         if (groupBy != null) {
             if (!groupBy.valueCheck(values)) throw new RuntimeException("Group by value is not in the list");
-            sql += groupBy.toString() + "\n";
+            sql += "\n" + groupBy.toString();
         }
-        if (limit > 0) sql += "LIMIT " + limit + (offset > 0 ? " OFFSET " + offset : "") + "\n";
-
+        if (limit > 0) sql += "\n" + "LIMIT " + limit + (offset > 0 ? " OFFSET " + offset : "");
 
         return sql + ';';
     }
