@@ -33,6 +33,7 @@ public class Table {
         tables.put(name, this);
     }
 
+    public Collection<Column> columns() { return columns.values(); }
     public Column column(String name) {
         return columns.get(name);
     }

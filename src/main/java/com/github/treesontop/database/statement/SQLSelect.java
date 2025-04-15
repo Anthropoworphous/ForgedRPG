@@ -62,6 +62,6 @@ public class SQLSelect implements SQLStatement, SQLGroup {
         if (limit > 0) sql += "LIMIT " + limit + (offset > 0 ? " OFFSET " + offset : "") + "\n";
 
 
-        return sql;
+        return sql + ';';
     }
 }

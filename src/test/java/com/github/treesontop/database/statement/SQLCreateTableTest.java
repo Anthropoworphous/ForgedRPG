@@ -1,9 +1,9 @@
-package com.github.treesontop.database.table;
+package com.github.treesontop.database.statement;
 
 import com.github.treesontop.database.DataBase;
-import com.github.treesontop.database.SQLDataType;
-import com.github.treesontop.database.data.SQLText;
 import com.github.treesontop.database.generator.TableGenerator;
+import com.github.treesontop.database.table.MockTable;
+import com.github.treesontop.database.table.Table;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,11 +11,10 @@ import org.junit.jupiter.api.Test;
 import java.io.InvalidObjectException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Set;
 import java.util.logging.Logger;
 
-class TableTest {
-    private static final Logger logger = Logger.getLogger(TableTest.class.getName());
+class SQLCreateTableTest {
+    private static Logger logger = Logger.getLogger(SQLCreateTable.class.getName());
     private Table table;
     private static Connection connection;
 
@@ -30,12 +29,17 @@ class TableTest {
     }
 
     @Test
-    void testFindExact() {
-        var statement = table.findExact(
-            Set.of(table.column("key").fill(new SQLText(SQLDataType.TINYTEXT, "k1"))),
-            "value1", "value2", "value3"
-        );
-        logger.info(statement.compile());
+    void testCompile() {
+        var statement = new SQLCreateTable(table);
+
+        String result = statement.compile();
+
+        logger.info(result);
+
+        try {
+            statement.execute(connection);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
-
