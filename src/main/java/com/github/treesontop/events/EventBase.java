@@ -39,7 +39,6 @@ public abstract class EventBase<E extends Event> implements EventListener<E> {
      */
     public void register(GlobalEventHandler eventHandler) {
         eventHandler.addListener(this);
-        logger.info("Event registered: " + getClass().getName());
     }
 
     @Override

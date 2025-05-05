@@ -5,13 +5,13 @@ import com.github.treesontop.database.table.Table;
 
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class TableGenerator {
     private static final Logger logger = Logger.getGlobal();
 
-    public static void generate() {
-        var classes = Util.getAnnotatedClass("com.github.treesontop", GenerateTable.class);
+    public static void generate(Set<Class<?>> classes) {
         logger.info("Generating " + classes.size() + " tables");
 
         for (Class<?> clazz : classes) {

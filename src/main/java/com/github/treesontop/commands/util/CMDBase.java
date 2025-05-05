@@ -25,9 +25,6 @@ public abstract class CMDBase {
                 .forEach(sender::sendMessage));
         }
 
-        //noinspection UnstableApiUsage
-        logger.info(cmd.getSyntaxesTree());
-
         cmdManager.register(cmd);
     }
 

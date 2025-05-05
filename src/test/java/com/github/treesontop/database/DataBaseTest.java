@@ -15,10 +15,7 @@ public class DataBaseTest {
 
     @BeforeEach
     public void setUp() throws SQLException, InvalidObjectException {
-        String url = "jdbc:sqlite::memory:";
-        DataBase.closeDataBase();
-        DataBase.wipeConnection();
-        connection = DataBase.setupDataBase(url);
+        connection = DataBase.setupMemoryDataBase();
     }
 
     @Test

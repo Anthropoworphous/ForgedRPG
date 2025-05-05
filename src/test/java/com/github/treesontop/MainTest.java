@@ -25,9 +25,9 @@ public class MainTest {
 
     @BeforeAll
     public static void setUp() {
-        minecraftServer = mock(MinecraftServer.class);
-        eventHandler = mock(GlobalEventHandler.class);
-        commandManager = mock(CommandManager.class);
+        minecraftServer = mock();
+        eventHandler = mock();
+        commandManager = mock();
     }
 
     @Test

@@ -4,6 +4,7 @@ import com.github.treesontop.database.Column;
 import com.github.treesontop.database.statement.label.SQLStatement;
 import com.github.treesontop.database.table.Row;
 import com.github.treesontop.database.table.Table;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -22,15 +23,18 @@ public class SQLInsert implements SQLStatement {
         if (table.columns().isEmpty()) throw new RuntimeException("Need at least one column that's not key");
     }
 
+    @CanIgnoreReturnValue
     public SQLInsert replace(boolean replace) {
         this.replace = replace;
         return this;
     }
 
+    @CanIgnoreReturnValue
     public SQLInsert insert(Row... row) {
         rows.addAll(List.of(row));
         return this;
     }
+    @CanIgnoreReturnValue
     public SQLInsert insert(Column.Filled key, Column.Filled... values) {
         rows.add(new Row(table, key, values));
         return this;

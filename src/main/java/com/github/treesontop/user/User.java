@@ -6,6 +6,7 @@ import com.github.treesontop.database.data.SQLInt;
 import com.github.treesontop.database.data.SQLText;
 import com.github.treesontop.database.generator.GenerateTable;
 import com.github.treesontop.database.generator.MakeColumn;
+import com.github.treesontop.database.table.Row;
 import com.github.treesontop.database.table.Table;
 import net.minestom.server.entity.Player;
 
@@ -30,9 +31,16 @@ public class User {
     @MakeColumn(name = "money", type = SQLDataType.INT)
     private int money = 0;
 
-    public User(Player player) {
+    private User(Player player) {
         this.player = player;
         this.uuid = player.getUuid();
+    }
+
+    public static User find(Player player) {
+        return users.get(player.getUuid());
+    }
+    public static User find(UUID uuid) {
+        return users.get(uuid);
     }
 
     public static User load(Player player) throws SQLException {
@@ -56,16 +64,18 @@ public class User {
 
         return user;
     }
-
     public static void save(Player player) throws SQLException {
-        logger.info("Saving player " + player.getUsername() + " @" + player.getUuid());
         var uuid = player.getUuid();
         var user = users.remove(uuid);
+        logger.info("Saving player " + player.getUsername() + " @" + uuid);
 
-        table.insert().insert(
-            table.key().fill(new SQLText(SQLDataType.TINYTEXT, uuid.toString())),
+        var row = new Row(table, table.key().fill(new SQLText(SQLDataType.TINYTEXT, uuid.toString())),
             table.column("money").fill(new SQLInt(SQLDataType.INT, user.money))
-        ).execute();
+        );
+
+        logger.info("Data: [%s]".formatted(row.toString()));
+
+        table.insert().insert(row).execute();
     }
 
     public void msg(String msg) {

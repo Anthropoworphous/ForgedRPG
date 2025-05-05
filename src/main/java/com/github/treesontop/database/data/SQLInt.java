@@ -25,4 +25,33 @@ public class SQLInt extends SQLData {
         }
         return Long.toString(num);
     }
+
+
+    public static SQLInt byteValue(int value) {
+        return new SQLInt(SQLDataType.BYTE, value);
+    }
+    public static SQLInt shortValue(int value) {
+        return new SQLInt(SQLDataType.SHORT, value);
+    }
+    public static SQLInt intValue(int value) {
+        return new SQLInt(SQLDataType.INT, value);
+    }
+    public static SQLInt longValue(int value) {
+        return new SQLInt(SQLDataType.LONG, value);
+    }
+    public static SQLInt longValue(long value) {
+        return new SQLInt(SQLDataType.LONG, value);
+    }
+
+    public static class Unsigned {
+        public static SQLInt byteValue(int value) {
+            return new SQLInt(SQLDataType.U_BYTE, value);
+        }
+        public static SQLInt shortValue(int value) {
+            return new SQLInt(SQLDataType.U_SHORT, value);
+        }
+        public static SQLInt intValue(int value) {
+            return new SQLInt(SQLDataType.U_INT, value);
+        }
+    }
 }

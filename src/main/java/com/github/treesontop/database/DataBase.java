@@ -29,12 +29,20 @@ public class DataBase {
         }
     }
 
+    public static Connection setupMemoryDataBase() throws SQLException, InvalidObjectException { return setupDataBase("jdbc:sqlite::memory:", true); }
+
     public static Connection setupDataBase(String url) throws InvalidObjectException, SQLException {
         if (sqlConn != null) {
             String errorMessage = "Database is already set up";
             logger.severe(errorMessage);
             throw new InvalidObjectException(errorMessage);
         }
+
+        return setupDataBase(url, true);
+    }
+    public static Connection setupDataBase(String url, boolean force) throws InvalidObjectException, SQLException {
+        if (!force) return setupDataBase(url);
+
         sqlConn = DriverManager.getConnection(url);
         logger.info("Database connection has been set up");
         return sqlConn;

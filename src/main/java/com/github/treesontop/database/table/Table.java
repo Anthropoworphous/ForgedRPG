@@ -63,6 +63,10 @@ public class Table {
         return new SQLInsert(this);
     }
 
+    public static void reset() {
+        tables.clear();
+    }
+
 
 
     public static class Builder {

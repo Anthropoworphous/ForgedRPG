@@ -15,7 +15,6 @@ public class PlayerDisconnect extends EventBase<PlayerDisconnectEvent> {
 
     @Override
     public Result execute(PlayerDisconnectEvent event) {
-        //TODO: NOT SAVING
         try {
             User.save(event.getPlayer());
         } catch (SQLException e) {
@@ -25,3 +24,4 @@ public class PlayerDisconnect extends EventBase<PlayerDisconnectEvent> {
         return Result.SUCCESS;
     }
 }
+

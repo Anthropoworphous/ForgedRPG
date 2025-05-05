@@ -18,11 +18,10 @@ public class MoneyCommand extends PlayerOnlyCMDBase {
 
         builder.implement((exe, ctx) -> {
             var m = ctx.get(money);
-            new User(exe).money(m);
+            User.find(exe).money(m);
             logger.info(exe.getUsername() + "'s money have been set to " + m);
         }, money);
-        builder.implement((exe, ctx) -> {
-            logger.info(exe.getUsername() + " have $" + new User(exe).money());
-        });
+        builder.implement((exe, ctx) ->
+            logger.info(exe.getUsername() + " have $" + User.find(exe).money()));
     }
 }

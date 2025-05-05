@@ -18,4 +18,14 @@ public class SQLText extends SQLData {
         }
         return "'" + txt + "'";
     }
+
+    public static SQLText tinyText(String text) {
+        return new SQLText(SQLDataType.TINYTEXT, text);
+    }
+    public static SQLText mediumText(String text) {
+        return new SQLText(SQLDataType.MEDIUMTEXT, text);
+    }
+    public static SQLText longText(String text) {
+        return new SQLText(SQLDataType.LONGTEXT, text);
+    }
 }

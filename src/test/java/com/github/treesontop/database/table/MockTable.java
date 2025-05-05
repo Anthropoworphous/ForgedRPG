@@ -9,6 +9,8 @@ import com.github.treesontop.database.generator.MakeColumn;
 @Util.DoNotScan
 @GenerateTable(name = "test_table")
 public class MockTable {
+    public static Table table;
+
     @MakeColumn(name = "key", type = SQLDataType.TINYTEXT, config = Column.Config.KEY)
     public String key;
 

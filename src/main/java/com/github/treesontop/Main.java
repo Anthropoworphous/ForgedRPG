@@ -4,6 +4,7 @@ import com.github.treesontop.commands.util.CMDBase;
 import com.github.treesontop.commands.util.PlayerOnlyCMDBase;
 import com.github.treesontop.commands.util.RegisterCommand;
 import com.github.treesontop.database.DataBase;
+import com.github.treesontop.database.generator.GenerateTable;
 import com.github.treesontop.database.generator.TableGenerator;
 import com.github.treesontop.events.EventBase;
 import com.github.treesontop.events.RegisterEvent;
@@ -19,18 +20,13 @@ import net.minestom.server.instance.InstanceManager;
 import net.minestom.server.instance.LightingChunk;
 import net.minestom.server.instance.block.Block;
 import net.minestom.server.timer.SchedulerManager;
-import org.beryx.textio.TextIoFactory;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Handler;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class Main {
     private static final Logger logger = Logger.getGlobal();
@@ -40,35 +36,9 @@ public class Main {
     public static Map<World, Instance> instances;
 
     public static void main(String[] args) {
-        var textio = TextIoFactory.getTextIO();
-        var terminal = textio.getTextTerminal();
-
-        Logger.getGlobal().addHandler(new Handler() {
-            @Override
-            public void publish(LogRecord record) {
-                terminal.printf("[%s - %s]: %s%n",
-                    record.getLevel().getName(),
-                    Arrays.stream(record.getLoggerName().split("\\.")).toList().getLast(),
-                    record.getMessage());
-
-                var err = record.getThrown();
-
-                if (err != null) {
-                    terminal.printf(Arrays.stream(err.getStackTrace())
-                        .map(StackTraceElement::toString)
-                        .collect(Collectors.joining("%n")));
-                }
-            }
-
-            @Override
-            public void flush() {}
-            @Override
-            public void close() throws SecurityException {}
-        });
-
+        Console.link();
         DataBase.connectToDB();
-
-        TableGenerator.generate();
+        TableGenerator.generate(Util.getAnnotatedClass("com.github.treesontop", GenerateTable.class));
 
         startUp(minecraftServer = MinecraftServer.init());
     }
