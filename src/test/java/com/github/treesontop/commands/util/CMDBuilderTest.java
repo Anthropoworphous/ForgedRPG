@@ -41,7 +41,7 @@ public class CMDBuilderTest {
         CommandExecutor executor = mock(CommandExecutor.class);
         Argument<String> arg = ArgumentType.String("arg");
 
-        cmdBuilder.implement(executor, annotater -> annotater.annotate(0, "Test annotation"), arg);
+        cmdBuilder.implement(executor, annotator -> annotator.annotate(0, "Test annotation"), arg);
 
         List<TextComponent> descriptions = cmdBuilder.generateArgsDescription("testCommand", 0);
 
@@ -52,12 +52,12 @@ public class CMDBuilderTest {
     }
 
     @Test
-    public void testArgumentAnnotater() {
-        CMDBuilder.ArgumentAnnotater annotater = new CMDBuilder.ArgumentAnnotater(1);
+    public void testArgumentAnnotator() {
+        CMDBuilder.ArgumentAnnotator annotator = new CMDBuilder.ArgumentAnnotator(1);
         Supplier<String> annotationSupplier = () -> "Test annotation";
 
-        annotater.annotate(0, annotationSupplier);
+        annotator.annotate(0, annotationSupplier);
 
-        assertEquals(annotationSupplier, annotater.annotations.get(0));
+        assertEquals(annotationSupplier, annotator.annotations.get(0));
     }
 }

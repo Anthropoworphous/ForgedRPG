@@ -1,4 +1,4 @@
-package com.github.treesontop.commands;
+package com.github.treesontop.commands.testing;
 
 import com.github.treesontop.commands.util.CMDBase;
 import com.github.treesontop.commands.util.CMDBuilder;
@@ -10,7 +10,7 @@ import net.minestom.server.command.builder.arguments.ArgumentString;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-@RegisterCommand(name = "database", alias = {"db"})
+@RegisterCommand(value = "database", alias = {"db"})
 public class DataBaseTestCommand extends CMDBase {
     private static ResultSet lastQuery = null;
 

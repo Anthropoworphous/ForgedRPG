@@ -7,7 +7,7 @@ import net.minestom.server.command.builder.arguments.minecraft.ArgumentItemStack
 import net.minestom.server.command.builder.arguments.number.ArgumentInteger;
 import net.minestom.server.item.ItemStack;
 
-@RegisterCommand(name = "give")
+@RegisterCommand("give")
 public class GiveCommand extends PlayerOnlyCMDBase {
     @Override
     protected void build(PlayerOnlyCMDBuilder builder) {

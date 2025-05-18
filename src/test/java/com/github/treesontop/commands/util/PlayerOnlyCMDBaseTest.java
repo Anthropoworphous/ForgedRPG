@@ -34,7 +34,7 @@ public class PlayerOnlyCMDBaseTest {
     }
 
     @Util.DoNotScan
-    @RegisterCommand(name = "mocked_cmd")
+    @RegisterCommand(value = "mocked_cmd")
     private static class MockCMD extends PlayerOnlyCMDBase {
         @Override
         protected void build(PlayerOnlyCMDBuilder builder) {

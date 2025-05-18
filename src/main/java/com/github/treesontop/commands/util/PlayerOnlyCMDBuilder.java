@@ -22,7 +22,7 @@ public class PlayerOnlyCMDBuilder extends CMDBuilder {
      * @param args       the command arguments
      * @return the PlayerOnlyCMDBuilder instance
      */
-    public PlayerOnlyCMDBuilder implement(PlayerExecutor exe, Consumer<ArgumentAnnotater> annotation, Argument<?>... args) {
+    public PlayerOnlyCMDBuilder implement(PlayerExecutor exe, Consumer<ArgumentAnnotator> annotation, Argument<?>... args) {
         this.implement((CommandExecutor) exe, annotation, args);
         return this;
     }

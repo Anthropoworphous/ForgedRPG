@@ -8,6 +8,7 @@ import com.github.treesontop.database.generator.GenerateTable;
 import com.github.treesontop.database.generator.MakeColumn;
 import com.github.treesontop.database.table.Row;
 import com.github.treesontop.database.table.Table;
+import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
 
 import java.sql.SQLException;
@@ -24,9 +25,13 @@ public class User {
     private static Table table;
 
     public final Player player;
+    public final Character character;
 
     @MakeColumn(name = "uuid", type = SQLDataType.TINYTEXT, config = Column.Config.KEY)
     public final UUID uuid;
+
+    @MakeColumn(name = "gamemode", type = SQLDataType.BYTE)
+    private byte gamemode = 0;
 
     @MakeColumn(name = "money", type = SQLDataType.INT)
     private int money = 0;
@@ -34,6 +39,7 @@ public class User {
     private User(Player player) {
         this.player = player;
         this.uuid = player.getUuid();
+        character = new Character(this);
     }
 
     public static User find(Player player) {
@@ -49,18 +55,26 @@ public class User {
 
         var resultSet = table.findExact(
             table.column("uuid").fill(new SQLText(SQLDataType.TINYTEXT, uuid.toString())),
-            "money"
+            "money", "gamemode"
         ).execute();
 
         var user = resultSet.map(result -> {
             var tempUser = new User(player);
             try {
                 tempUser.money = result.getInt("money");
+                tempUser.gamemode = result.getByte("gamemode");
             } catch (SQLException ignored) {}
             return tempUser;
-        }).orElse(new User(player));
+        }).orElseGet(() -> new User(player));
 
         users.put(uuid, user);
+
+        switch (user.gamemode) {
+            case 0 -> player.setGameMode(GameMode.SURVIVAL);
+            case 1 -> player.setGameMode(GameMode.CREATIVE);
+            case 2 -> player.setGameMode(GameMode.SPECTATOR);
+            case 3 -> player.setGameMode(GameMode.ADVENTURE);
+        }
 
         return user;
     }
@@ -69,8 +83,16 @@ public class User {
         var user = users.remove(uuid);
         logger.info("Saving player " + player.getUsername() + " @" + uuid);
 
+        var mode = switch (player.getGameMode()) {
+            case GameMode.SURVIVAL -> 0;
+            case GameMode.CREATIVE -> 1;
+            case GameMode.SPECTATOR -> 2;
+            case GameMode.ADVENTURE -> 3;
+        };
+
         var row = new Row(table, table.key().fill(new SQLText(SQLDataType.TINYTEXT, uuid.toString())),
-            table.column("money").fill(new SQLInt(SQLDataType.INT, user.money))
+            table.column("money").fill(new SQLInt(SQLDataType.INT, user.money)),
+            table.column("gamemode").fill(new SQLInt(SQLDataType.BYTE, mode))
         );
 
         logger.info("Data: [%s]".formatted(row.toString()));

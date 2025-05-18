@@ -5,7 +5,7 @@ import com.github.treesontop.commands.util.CMDBuilder;
 import com.github.treesontop.commands.util.RegisterCommand;
 import net.minestom.server.MinecraftServer;
 
-@RegisterCommand(name = "shutdown")
+@RegisterCommand("shutdown")
 public class Shutdown extends CMDBase {
     @Override
     protected void build(CMDBuilder builder) {

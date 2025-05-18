@@ -6,7 +6,7 @@ import com.github.treesontop.commands.util.RegisterCommand;
 import net.minestom.server.command.builder.arguments.ArgumentEnum;
 import net.minestom.server.entity.GameMode;
 
-@RegisterCommand(name = "gamemode", alias = {"gm"})
+@RegisterCommand(value = "gamemode", alias = {"gm"})
 public class GamemodeCommand extends PlayerOnlyCMDBase {
     @Override
     protected void build(PlayerOnlyCMDBuilder builder) {
@@ -18,7 +18,7 @@ public class GamemodeCommand extends PlayerOnlyCMDBase {
                     p.setGameMode(mode);
                     p.sendMessage("Your gamemode has been set to " + mode.name());
                 },
-                annotater -> annotater.annotate(0, "creative | survival | adventure | spectator"),
+                annotator -> annotator.annotate(0, "creative | survival | adventure | spectator"),
                 GamemodeArgument
         );
     }

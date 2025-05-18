@@ -1,11 +1,39 @@
 package com.github.treesontop.gameplay.stats;
 
+import com.github.treesontop.gameplay.stats.lease.IStatLeaseManager;
+import com.github.treesontop.gameplay.stats.lease.StatsBorrower;
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+
+//NOTE: snapshot.value().get() should only be call with the caller itself.
 public interface IStats {
-    boolean required();
+    IStatLeaseManager leaseManager();
 
-    StatRange range();
-    float consume(float value);
-    float provide(float value);
+    StatsRange range();
 
-    boolean lease(StatsBorrower borrower);
+    default float defaultValue() {
+        if (!needValue()) throw new RuntimeException("No value should be defined for this stat");
+        return range().max();
+    }
+    default boolean needValue() { return true; }
+
+    /**
+     * Reduce value of stats base on stats and input
+     * @param self the snapshot of the stats owner
+     * @param value input, not to be confused with the value of stats
+     * @return new stats value
+     */
+    @CanIgnoreReturnValue
+    float consume(StatsSnapshot self, float value);
+    /**
+     * Increase value of stats base on stats and input
+     * @param self the snapshot of the stats owner
+     * @param value input, not to be confused with the value of stats
+     * @return new stats value
+     */
+    @CanIgnoreReturnValue
+    float provide(StatsSnapshot self, float value);
+
+    default boolean lease(StatsBorrower borrower) {
+        return leaseManager().lease(borrower);
+    }
 }

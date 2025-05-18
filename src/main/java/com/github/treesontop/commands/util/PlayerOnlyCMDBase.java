@@ -43,7 +43,7 @@ public abstract class PlayerOnlyCMDBase {
             logger.severe(errorMessage);
             throw new RuntimeException(errorMessage);
         }
-        return new Command(ann.name(), ann.alias());
+        return new Command(ann.value(), ann.alias());
     }
 
     /**

@@ -45,7 +45,7 @@ public class PlayerOnlyCMDBuilderTest {
         PlayerOnlyCMDBuilder.PlayerExecutor executor = mock(PlayerOnlyCMDBuilder.PlayerExecutor.class);
         Argument<String> arg = ArgumentType.String("arg");
 
-        playerOnlyCMDBuilder.implement(executor, annotater -> annotater.annotate(0, "Test annotation"), arg);
+        playerOnlyCMDBuilder.implement(executor, annotator -> annotator.annotate(0, "Test annotation"), arg);
 
         List<TextComponent> descriptions = playerOnlyCMDBuilder.generateArgsDescription("testCommand", 0);
 

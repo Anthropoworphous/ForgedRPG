@@ -8,7 +8,7 @@ import net.minestom.server.command.builder.arguments.number.ArgumentInteger;
 
 import java.util.logging.Logger;
 
-@RegisterCommand(name = "money")
+@RegisterCommand("money")
 public class MoneyCommand extends PlayerOnlyCMDBase {
     private static final Logger logger = Logger.getGlobal();
 

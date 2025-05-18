@@ -11,7 +11,7 @@ import net.minestom.server.entity.Entity;
 
 import java.util.List;
 
-@RegisterCommand(name = "tp", alias = {"teleport"})
+@RegisterCommand(value = "tp", alias = {"teleport"})
 public class TeleportCommand extends PlayerOnlyCMDBase {
     @Override
     protected void build(PlayerOnlyCMDBuilder builder) {

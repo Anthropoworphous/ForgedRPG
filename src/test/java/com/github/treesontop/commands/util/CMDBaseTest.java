@@ -34,7 +34,7 @@ public class CMDBaseTest {
     }
 
     @Util.DoNotScan
-    @RegisterCommand(name = "mocked_cmd")
+    @RegisterCommand(value = "mocked_cmd")
     private static class MockCMD extends CMDBase {
         @Override
         protected void build(CMDBuilder builder) {

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class CMDBuilder {
@@ -33,16 +32,16 @@ public class CMDBuilder {
     @CanIgnoreReturnValue
     public CMDBuilder implement(
             CommandExecutor exe,
-            Consumer<ArgumentAnnotater> annotation,
+            Consumer<ArgumentAnnotator> annotation,
             Argument<?>... args
     ) {
         counts++;
         executor.add(exe);
 
-        ArgumentAnnotater annotater = new ArgumentAnnotater(args.length);
-        if (annotation != null) annotation.accept(annotater);
+        ArgumentAnnotator annotator = new ArgumentAnnotator(args.length);
+        if (annotation != null) annotation.accept(annotator);
 
-        annotations.add(annotater.annotations);
+        annotations.add(annotator.annotations);
         argList.add(args);
 
         return this;
@@ -91,15 +90,15 @@ public class CMDBuilder {
     /**
      * Class for annotating command arguments.
      */
-    public static class ArgumentAnnotater {
+    public static class ArgumentAnnotator {
         public final List<Supplier<String>> annotations;
 
         /**
-         * Constructs an ArgumentAnnotater with the specified number of arguments.
+         * Constructs an ArgumentAnnotator with the specified number of arguments.
          *
          * @param counts the number of arguments
          */
-        public ArgumentAnnotater(int counts) {
+        public ArgumentAnnotator(int counts) {
             annotations = new ArrayList<>(counts);
         }
 
@@ -108,10 +107,10 @@ public class CMDBuilder {
          *
          * @param argIndex   the index of the argument
          * @param annotation the annotation supplier
-         * @return the ArgumentAnnotater instance
+         * @return the ArgumentAnnotator instance
          */
         @CanIgnoreReturnValue
-        public ArgumentAnnotater annotate(int argIndex, Supplier<String> annotation) {
+        public ArgumentAnnotator annotate(int argIndex, Supplier<String> annotation) {
             while (annotations.size() <= argIndex) annotations.add(null);
             annotations.set(argIndex, annotation);
             return this;
@@ -122,10 +121,10 @@ public class CMDBuilder {
          *
          * @param argIndex   the index of the argument
          * @param annotation the annotation
-         * @return the ArgumentAnnotater instance
+         * @return the ArgumentAnnotator instance
          */
         @CanIgnoreReturnValue
-        public ArgumentAnnotater annotate(int argIndex, String annotation) {
+        public ArgumentAnnotator annotate(int argIndex, String annotation) {
             while (annotations.size() <= argIndex) annotations.add(null);
             annotations.set(argIndex, () -> annotation);
             return this;
@@ -135,10 +134,10 @@ public class CMDBuilder {
          * Skips the annotation for the specified argument.
          *
          * @param argIndex the index of the argument
-         * @return the ArgumentAnnotater instance
+         * @return the ArgumentAnnotator instance
          */
         @CanIgnoreReturnValue
-        public ArgumentAnnotater skipAnnotation(int argIndex) {
+        public ArgumentAnnotator skipAnnotation(int argIndex) {
             while (annotations.size() <= argIndex) annotations.add(null);
             annotations.set(argIndex, () -> null);
             return this;

@@ -8,6 +8,7 @@ import com.github.treesontop.database.generator.GenerateTable;
 import com.github.treesontop.database.generator.TableGenerator;
 import com.github.treesontop.events.EventBase;
 import com.github.treesontop.events.RegisterEvent;
+import com.github.treesontop.gameplay.entity.IGameEntity;
 import com.github.treesontop.user.User;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
@@ -52,6 +53,8 @@ public class Main {
         schedulerManager.buildShutdownTask(Main::shutdown);
 
         try {
+            IGameEntity.registerAll();
+
             registerEvent(Util.getAnnotatedClass("com.github.treesontop.events", RegisterEvent.class),
                 MinecraftServer.getGlobalEventHandler());
             registerCommand(Util.getAnnotatedClass("com.github.treesontop.commands", RegisterCommand.class),

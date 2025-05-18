@@ -1,11 +1,10 @@
 package com.github.treesontop;
 
 import org.reflections.Reflections;
-import org.reflections.scanners.Scanner;
-import org.reflections.scanners.Scanners;
 
 import java.lang.annotation.*;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class Util {
@@ -24,4 +23,41 @@ public class Util {
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
     public @interface DoNotScan {}
+
+    public static class Cache<T> {
+        private final Supplier<T> getter;
+        private T value;
+
+        public Cache(Supplier<T> source) {
+            getter = source;
+            update();
+        }
+
+        public void update() {
+            value = getter.get();
+        }
+
+        public T value() { return value; }
+
+        public static class UpdateTrigger {
+            private final Set<Cache<?>> caches;
+
+            public UpdateTrigger(Set<Cache<?>> caches) {
+                this.caches = caches;
+            }
+
+            public UpdateTrigger join(UpdateTrigger other) {
+                caches.addAll(other.caches);
+                return this;
+            }
+            public UpdateTrigger add(Cache<?>... other) {
+                caches.addAll(Set.of(other));
+                return this;
+            }
+
+            public void update() {
+                caches.forEach(Cache::update);
+            }
+        }
+    }
 }
