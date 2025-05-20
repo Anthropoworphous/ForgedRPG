@@ -16,9 +16,22 @@ public class ItemManager {
         var classes = Util.getAnnotatedClass("com.github.treesontop.gameplay.item", Register.class);
         for (var c : classes) {
             try {
+                if (c.isInterface()) continue;
                 var item = c.getConstructor().newInstance();
-                if (!(item instanceof IGameItem)) continue;
-                itemRegistry.put(c.getAnnotation(Register.class).id(), (IGameItem) item);
+                if (!(item instanceof IGameItem gameItem)) continue;
+
+                var id = new StringBuilder();
+                var cSup = c;
+                do {
+                    Register annotation = cSup.getAnnotation(Register.class);
+                    if (annotation != null) {
+                        String value = annotation.value();
+                        if (value != null) id.insert(0, value + "/");
+                    }
+                    cSup = cSup.getSuperclass();
+                } while (cSup != null);
+                gameItem.init();
+                itemRegistry.put(id.toString(), gameItem);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -38,6 +51,6 @@ public class ItemManager {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
     public @interface Register {
-        String id();
+        String value();
     }
 }

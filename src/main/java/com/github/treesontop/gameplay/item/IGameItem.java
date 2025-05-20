@@ -9,4 +9,6 @@ public interface IGameItem {
 
     IGameItem fromItem(ItemStack item);
     ItemStack toItem();
+
+    void init();
 }

@@ -1,7 +1,7 @@
 package com.github.treesontop.gameplay.stats.impl.hp;
 
 import com.github.treesontop.gameplay.stats.IStats;
-import com.github.treesontop.gameplay.stats.StatsSnapshot;
+import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
 import com.github.treesontop.gameplay.stats.impl.BasicLender;
 import com.github.treesontop.gameplay.stats.lease.StatsBorrower;
 
@@ -27,7 +27,7 @@ public class Health extends BasicLender implements IStats {
     }
 
 
-
+//TODO: hit for 0???
     public static class InfiniteHP extends Health {
         public InfiniteHP() {
             super(1);

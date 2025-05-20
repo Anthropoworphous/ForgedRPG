@@ -1,7 +1,7 @@
 package com.github.treesontop.gameplay.stats.impl.heal.regen;
 
 import com.github.treesontop.gameplay.stats.StatsCycle;
-import com.github.treesontop.gameplay.stats.StatsSnapshot;
+import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
 import com.github.treesontop.gameplay.stats.impl.BasicLender;
 import com.github.treesontop.gameplay.stats.impl.IStaticStat;
 

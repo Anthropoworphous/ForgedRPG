@@ -1,6 +1,6 @@
 package com.github.treesontop.gameplay.stats.lease;
 
-import com.github.treesontop.gameplay.stats.StatsRange;
+import com.github.treesontop.gameplay.stats.component.StatsRange;
 
 import java.util.ArrayList;
 import java.util.List;

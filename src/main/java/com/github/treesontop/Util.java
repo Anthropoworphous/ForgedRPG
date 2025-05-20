@@ -45,6 +45,9 @@ public class Util {
             public UpdateTrigger(Set<Cache<?>> caches) {
                 this.caches = caches;
             }
+            public UpdateTrigger(Cache<?>... caches) {
+                this.caches = Set.of(caches);
+            }
 
             public UpdateTrigger join(UpdateTrigger other) {
                 caches.addAll(other.caches);
@@ -59,5 +62,9 @@ public class Util {
                 caches.forEach(Cache::update);
             }
         }
+    }
+
+    public static record Pair<T1, T2>(T1 v1, T2 v2) {
+
     }
 }

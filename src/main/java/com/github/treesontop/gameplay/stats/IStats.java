@@ -1,5 +1,7 @@
 package com.github.treesontop.gameplay.stats;
 
+import com.github.treesontop.gameplay.stats.component.StatsRange;
+import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
 import com.github.treesontop.gameplay.stats.lease.IStatLeaseManager;
 import com.github.treesontop.gameplay.stats.lease.StatsBorrower;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;

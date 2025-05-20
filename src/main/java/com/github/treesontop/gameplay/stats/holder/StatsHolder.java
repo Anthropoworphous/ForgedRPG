@@ -1,8 +1,5 @@
 package com.github.treesontop.gameplay.stats.holder;
 
-import com.github.treesontop.gameplay.stats.IStatsProfile;
-import com.github.treesontop.gameplay.stats.StatsSnapshot;
-
 public abstract class StatsHolder implements IStatsProfile {
     private StatsSnapshot snapshot = null;
 

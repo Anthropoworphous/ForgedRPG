@@ -2,12 +2,9 @@ package com.github.treesontop.gameplay.entity.impl;
 
 import com.github.treesontop.gameplay.entity.IGameEntity;
 import com.github.treesontop.gameplay.entity.RegisterEntity;
-import com.github.treesontop.gameplay.stats.IStatsProfile;
-import com.github.treesontop.gameplay.stats.StatsSnapshot;
+import com.github.treesontop.gameplay.stats.holder.IStatsProfile;
+import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
 import com.github.treesontop.gameplay.stats.holder.StatsHolder;
-import com.github.treesontop.gameplay.stats.impl.def.Armor;
-import com.github.treesontop.gameplay.stats.impl.def.Resistance;
-import com.github.treesontop.gameplay.stats.impl.heal.regen.HealthRegen;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
@@ -24,21 +21,6 @@ public class TargetDummy extends StatsHolder implements IGameEntity, IStatsProfi
         var result = IGameEntity.super.spawn(instance, pos);
         init(new StatsSnapshot(this));
         return result;
-    }
-
-    @Override
-    public Armor armor() {
-        return Armor.none;
-    }
-
-    @Override
-    public Resistance res() {
-        return Resistance.none;
-    }
-
-    @Override
-    public HealthRegen hp_r() {
-        return HealthRegen.none;
     }
 
     @Override

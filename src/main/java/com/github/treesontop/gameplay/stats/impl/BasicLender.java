@@ -1,7 +1,7 @@
 package com.github.treesontop.gameplay.stats.impl;
 
 import com.github.treesontop.gameplay.stats.IStats;
-import com.github.treesontop.gameplay.stats.StatsRange;
+import com.github.treesontop.gameplay.stats.component.StatsRange;
 import com.github.treesontop.gameplay.stats.lease.IStatLeaseManager;
 import com.github.treesontop.gameplay.stats.lease.StatLeaseManager;
 

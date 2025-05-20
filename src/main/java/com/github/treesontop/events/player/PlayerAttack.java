@@ -3,7 +3,7 @@ package com.github.treesontop.events.player;
 import com.github.treesontop.events.EventBase;
 import com.github.treesontop.events.RegisterEvent;
 import com.github.treesontop.gameplay.entity.IGameEntity;
-import com.github.treesontop.gameplay.stats.IStatsProfile;
+import com.github.treesontop.gameplay.stats.holder.IStatsProfile;
 import com.github.treesontop.user.User;
 import net.minestom.server.entity.Player;
 import net.minestom.server.event.entity.EntityAttackEvent;

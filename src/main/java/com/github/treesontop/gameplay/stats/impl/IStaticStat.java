@@ -1,7 +1,7 @@
 package com.github.treesontop.gameplay.stats.impl;
 
 import com.github.treesontop.gameplay.stats.IStats;
-import com.github.treesontop.gameplay.stats.StatsSnapshot;
+import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
 
 public interface IStaticStat extends IStats {
     @Override

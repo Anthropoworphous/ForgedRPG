@@ -1,6 +1,6 @@
 package com.github.treesontop.gameplay.stats.lease;
 
-import com.github.treesontop.gameplay.stats.StatsRange;
+import com.github.treesontop.gameplay.stats.component.StatsRange;
 
 public interface IStatLeaseManager {
     boolean lease(StatsBorrower client);

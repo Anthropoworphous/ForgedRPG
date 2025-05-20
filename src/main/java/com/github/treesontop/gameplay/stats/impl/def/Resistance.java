@@ -1,6 +1,6 @@
 package com.github.treesontop.gameplay.stats.impl.def;
 
-import com.github.treesontop.gameplay.stats.StatsSnapshot;
+import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
 import com.github.treesontop.gameplay.stats.impl.BasicLender;
 import com.github.treesontop.gameplay.stats.impl.IStaticStat;
 

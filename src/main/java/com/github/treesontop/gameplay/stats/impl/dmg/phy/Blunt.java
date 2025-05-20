@@ -1,7 +1,7 @@
 package com.github.treesontop.gameplay.stats.impl.dmg.phy;
 
-import com.github.treesontop.gameplay.stats.StatsRange;
-import com.github.treesontop.gameplay.stats.StatsSnapshot;
+import com.github.treesontop.gameplay.stats.component.StatsRange;
+import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
 import com.github.treesontop.gameplay.stats.impl.BasicLender;
 import com.github.treesontop.gameplay.stats.impl.IStaticStat;
 
