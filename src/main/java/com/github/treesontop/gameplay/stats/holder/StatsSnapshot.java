@@ -1,5 +1,6 @@
-package com.github.treesontop.gameplay.stats;
+package com.github.treesontop.gameplay.stats.holder;
 
+import com.github.treesontop.gameplay.stats.IStats;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import java.lang.reflect.Method;

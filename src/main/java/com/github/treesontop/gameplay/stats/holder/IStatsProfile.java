@@ -1,4 +1,4 @@
-package com.github.treesontop.gameplay.stats;
+package com.github.treesontop.gameplay.stats.holder;
 
 import com.github.treesontop.gameplay.stats.impl.def.Armor;
 import com.github.treesontop.gameplay.stats.impl.def.Resistance;
@@ -6,6 +6,7 @@ import com.github.treesontop.gameplay.stats.impl.dmg.art.Art;
 import com.github.treesontop.gameplay.stats.impl.dmg.penetration.art.Tenacity;
 import com.github.treesontop.gameplay.stats.impl.dmg.penetration.phy.Pierce;
 import com.github.treesontop.gameplay.stats.impl.dmg.phy.Blunt;
+import com.github.treesontop.gameplay.stats.impl.dmg.phy.Puncture;
 import com.github.treesontop.gameplay.stats.impl.heal.regen.HealthRegen;
 import com.github.treesontop.gameplay.stats.impl.hp.Health;
 
@@ -43,6 +44,7 @@ public interface IStatsProfile {
     // L___penetration
     //     L___phy
     Pierce pierce();
+    Puncture puncture();
     //     L___art
     Tenacity tenacity();
 
@@ -73,6 +75,21 @@ public interface IStatsProfile {
         default Health hp() {
             return new Health.InfiniteHP();
         }
+
+        @Override
+        default Armor armor() {
+            return Armor.none;
+        }
+
+        @Override
+        default Resistance res() {
+            return Resistance.none;
+        }
+
+        @Override
+        default HealthRegen hp_r() {
+            return HealthRegen.none;
+        }
     }
 
     public interface INoAttackProfile extends IStatsProfile {
@@ -84,6 +101,10 @@ public interface IStatsProfile {
         @Override
         default Blunt blunt() {
             return Blunt.none;
+        }
+        @Override
+        default Puncture puncture() {
+            return Puncture.none;
         }
 
         @Override
