@@ -11,10 +11,12 @@ import com.github.treesontop.gameplay.stats.impl.dmg.penetration.art.Tenacity;
 import com.github.treesontop.gameplay.stats.impl.dmg.penetration.phy.Pierce;
 import com.github.treesontop.gameplay.stats.impl.dmg.phy.Blunt;
 import com.github.treesontop.gameplay.stats.impl.dmg.phy.Puncture;
+import com.github.treesontop.gameplay.stats.impl.dmg.phy.Slash;
 
 public class Character extends StatsHolder implements IStatsProfile.IDefaultStatsProfile, IPlayerWearer {
     private final User user;
 
+    private final Util.Cache<Slash> slash;
     private final Util.Cache<Blunt> blunt;
     private final Util.Cache<Puncture> puncture;
     private final Util.Cache<Art> art;
@@ -24,10 +26,12 @@ public class Character extends StatsHolder implements IStatsProfile.IDefaultStat
     public Character(User user) {
         this.user = user;
         blunt = new Util.Cache<>(() -> new Blunt(new StatsRange(weapon().getAttack(Blunt.class))));
+        slash = new Util.Cache<>(() -> new Slash(new StatsRange(weapon().getAttack(Slash.class))));
         puncture = new Util.Cache<>(() -> new Puncture(new StatsRange(weapon().getAttack(Puncture.class))));
         art = new Util.Cache<>(() -> new Art(new StatsRange(weapon().getAttack(Art.class))));
-        updateTrigger = new Util.Cache.UpdateTrigger(blunt, puncture, art);
+        updateTrigger = new Util.Cache.UpdateTrigger(slash, blunt, puncture, art);
         init(new StatsSnapshot(this));
+        updateTrigger.update();
     }
 
     @Override
@@ -35,6 +39,10 @@ public class Character extends StatsHolder implements IStatsProfile.IDefaultStat
         return user;
     }
 
+    @Override
+    public Slash slash() {
+        return slash.value();
+    }
     @Override
     public Blunt blunt() {
         return blunt.value();

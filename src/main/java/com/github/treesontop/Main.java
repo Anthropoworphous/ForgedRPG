@@ -9,6 +9,7 @@ import com.github.treesontop.database.generator.TableGenerator;
 import com.github.treesontop.events.EventBase;
 import com.github.treesontop.events.RegisterEvent;
 import com.github.treesontop.gameplay.entity.IGameEntity;
+import com.github.treesontop.gameplay.item.ItemManager;
 import com.github.treesontop.user.User;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
@@ -30,7 +31,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Main {
-    private static final Logger logger = Logger.getGlobal();
+    public static final Map<String, String> env = System.getenv();
+    public static final Logger logger = Logger.getGlobal();
+
     public static MinecraftServer minecraftServer;
     public static InstanceManager instanceManager;
 
@@ -40,6 +43,7 @@ public class Main {
         Console.link();
         DataBase.connectToDB();
         TableGenerator.generate(Util.getAnnotatedClass("com.github.treesontop", GenerateTable.class));
+        ItemManager.registerAllItems();
 
         startUp(minecraftServer = MinecraftServer.init());
     }

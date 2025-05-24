@@ -1,18 +1,18 @@
 package com.github.treesontop.database.generator;
 
-import com.github.treesontop.Util;
+import com.github.treesontop.Main;
 import com.github.treesontop.database.table.Table;
 
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Set;
-import java.util.logging.Logger;
+
 
 public class TableGenerator {
-    private static final Logger logger = Logger.getGlobal();
+
 
     public static void generate(Set<Class<?>> classes) {
-        logger.info("Generating " + classes.size() + " tables");
+        Main.logger.info("Generating " + classes.size() + " tables");
 
         for (Class<?> clazz : classes) {
             Table table = generateTable(clazz);
@@ -23,12 +23,12 @@ public class TableGenerator {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-            logger.info("Generated " + table.name);
+            Main.logger.info("Generated " + table.name);
         }
     }
 
     public static Table generateTable(Class<?> clazz) {
-        var table = new Table.Builder(clazz.getAnnotation(GenerateTable.class).name());
+        var table = new Table.Builder(clazz.getAnnotation(GenerateTable.class).value());
         Arrays.stream(clazz.getDeclaredFields())
             .filter(field -> field.isAnnotationPresent(MakeColumn.class))
             .map(marked -> marked.getAnnotation(MakeColumn.class))
@@ -40,7 +40,7 @@ public class TableGenerator {
         try {
             var field = clazz.getDeclaredField("table");
             if (field.getType() != Table.class) {
-                logger.info(clazz.getName() + " have a field named \"table\", which is used to insert a reference");
+                Main.logger.info(clazz.getName() + " have a field named \"table\", which is used to insert a reference");
             } else {
                 field.setAccessible(true);
                 field.set(table, table);
@@ -48,7 +48,7 @@ public class TableGenerator {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         } catch (NoSuchFieldException e) {
-            logger.info(clazz.getName() + " does not have a \"table\" field");
+            Main.logger.info(clazz.getName() + " does not have a \"table\" field");
         }
     }
 }

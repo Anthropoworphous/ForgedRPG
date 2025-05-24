@@ -1,5 +1,6 @@
 package com.github.treesontop.gameplay.stats.holder;
 
+import com.github.treesontop.Main;
 import com.github.treesontop.gameplay.stats.IStats;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
@@ -7,13 +8,13 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.logging.Logger;
+
 
 public record StatsSnapshot(
     IStatsProfile profile,
     Map<Class<? extends IStats>, Float> value
 ) {
-    private static final Logger logger = Logger.getGlobal();
+
 
     public StatsSnapshot(IStatsProfile profile) {
         this(profile, new HashMap<>());
@@ -28,7 +29,7 @@ public record StatsSnapshot(
                 //Should be checked already by the isAssignableFrom statement
                 //noinspection unchecked
                 value.put((Class<? extends IStats>) returnType, def);
-                logger.info("%s default to %s".formatted(m.getName(), def));
+                Main.logger.info("%s default to %s".formatted(m.getName(), def));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

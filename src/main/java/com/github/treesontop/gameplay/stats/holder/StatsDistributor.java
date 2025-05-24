@@ -1,5 +1,6 @@
 package com.github.treesontop.gameplay.stats.holder;
 
+import com.github.treesontop.Main;
 import com.github.treesontop.gameplay.stats.IStats;
 
 import javax.annotation.Nullable;
@@ -35,7 +36,10 @@ public class StatsDistributor<T extends IStats> {
 
     public float scale(Class<? extends T> type, float original) {
         var scale = distribution.get(type);
-        if (scale == null) return 0;
+        if (scale == null) {
+            Main.logger.info("Item doesn't have " + type.getSimpleName());
+            return 0;
+        }
         var value = scale * original;
         if (source != null) {
             if (!distribution.containsKey(type)) return source.scale(type, original);

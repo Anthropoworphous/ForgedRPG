@@ -11,6 +11,9 @@ import java.util.stream.Collectors;
 
 public class Console {
     private static final TextTerminal<?> terminal = TextIoFactory.getTextIO().getTextTerminal();
+    private static TextTerminal<?> dmgTerminal;
+
+    private static final Util.Cache<Boolean> logDamage = new Util.Cache<>(() -> Main.env.containsKey("log_damage"));
 
     public static void link() {
         Logger.getGlobal().addHandler(new Handler() {
@@ -35,5 +38,13 @@ public class Console {
             @Override
             public void close() throws SecurityException {}
         });
+
+        logDamage.update();
+        if (logDamage.value()) dmgTerminal = TextIoFactory.getTextIO().getTextTerminal();
+    }
+
+    public void logDamage(String str) {
+        if (!logDamage.value()) return;
+        dmgTerminal.print("[Damage]" + str);
     }
 }

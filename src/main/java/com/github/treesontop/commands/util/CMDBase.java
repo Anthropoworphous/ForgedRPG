@@ -3,10 +3,10 @@ package com.github.treesontop.commands.util;
 import net.minestom.server.command.CommandManager;
 import net.minestom.server.command.builder.Command;
 
-import java.util.logging.Logger;
+
 
 public abstract class CMDBase {
-    private static final Logger logger = Logger.getGlobal();
+
 
     /**
      * Registers the command with the command manager.
@@ -38,7 +38,7 @@ public abstract class CMDBase {
         RegisterCommand ann = getClass().getAnnotation(RegisterCommand.class);
         if (ann == null) {
             String errorMessage = "Class " + getClass().getName() + " not annotated";
-            logger.severe(errorMessage);
+
             throw new RuntimeException(errorMessage);
         }
         return new Command(ann.value(), ann.alias());

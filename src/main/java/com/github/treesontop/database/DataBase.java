@@ -6,25 +6,21 @@ import java.io.InvalidObjectException;
 import java.sql.*;
 import java.util.Optional;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 public class DataBase {
-    private static final Logger logger = Logger.getGlobal();
-    private static Connection sqlConn;
 
-    static {
-        logger.setParent(Logger.getLogger(Main.class.getName()));
-    }
+    private static Connection sqlConn;
 
     public static void connectToDB() {
         var url = "jdbc:sqlite:C:/Users/kevin/IdeaProjects/ForgeRPG/TempSQLDataBase/data.db";
         try {
             DataBase.setupDataBase(url);
-            logger.info("Connection to SQLite has been established.");
+            Main.logger.info("Connection to SQLite has been established.");
         } catch (SQLException e) {
-            logger.log(Level.SEVERE, "Database connection error", e);
+            Main.logger.log(Level.SEVERE, "Database connection error", e);
         } catch (InvalidObjectException e) {
-            logger.log(Level.SEVERE, "Database setup error", e);
+            Main.logger.log(Level.SEVERE, "Database setup error", e);
             throw new RuntimeException(e);
         }
     }
@@ -34,7 +30,7 @@ public class DataBase {
     public static Connection setupDataBase(String url) throws InvalidObjectException, SQLException {
         if (sqlConn != null) {
             String errorMessage = "Database is already set up";
-            logger.severe(errorMessage);
+            Main.logger.severe(errorMessage);
             throw new InvalidObjectException(errorMessage);
         }
 
@@ -44,13 +40,13 @@ public class DataBase {
         if (!force) return setupDataBase(url);
 
         sqlConn = DriverManager.getConnection(url);
-        logger.info("Database connection has been set up");
+        Main.logger.info("Database connection has been set up");
         return sqlConn;
     }
 
     public static void closeDataBase() throws SQLException {
         if (sqlConn == null) {
-            logger.info("Database connection is not set up");
+            Main.logger.info("Database connection is not set up");
         } else {
             sqlConn.close();
         }
@@ -63,7 +59,7 @@ public class DataBase {
     public static PreparedStatement getStatement(String sql) throws SQLException {
         if (sqlConn == null) {
             String errorMessage = "Database connection is not set up";
-            logger.severe(errorMessage);
+            Main.logger.severe(errorMessage);
             throw new SQLException(errorMessage);
         }
         return sqlConn.prepareStatement(sql);
@@ -72,12 +68,12 @@ public class DataBase {
     public static Optional<ResultSet> runStatement(String sql) throws SQLException {
         if (sqlConn == null) {
             String errorMessage = "Database connection is not set up";
-            logger.severe(errorMessage);
+            Main.logger.severe(errorMessage);
             throw new SQLException(errorMessage);
         }
 
-        logger.info("Running SQL statement: ");
-        logger.info(sql);
+        Main.logger.info("Running SQL statement: ");
+        Main.logger.info(sql);
 
         var statement = sqlConn.createStatement();
         return statement.execute(sql) ? Optional.of(statement.getResultSet()) : Optional.empty();
