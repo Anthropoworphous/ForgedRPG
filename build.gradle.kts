@@ -28,12 +28,3 @@ tasks.named<Test>("test") {
     jvmArgs("-XX:+EnableDynamicAgentLoading")
     useJUnitPlatform()
 }
-
-// Make the compile task depend on the annotation processing
-tasks.compileJava {
-    options.compilerArgs.add("-Xlint:unchecked")
-}
-
-tasks.wrapper {
-    gradleVersion = "v8.14.1"
-}
