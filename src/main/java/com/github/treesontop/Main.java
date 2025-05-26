@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Main {
+public class    Main {
     public static final Map<String, String> env = System.getenv();
     public static final Logger logger = Logger.getGlobal();
 

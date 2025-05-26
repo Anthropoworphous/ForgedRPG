@@ -5,6 +5,11 @@ plugins {
 group = "com.github.treesontop"
 version = "1.0-SNAPSHOT"
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_23
+    targetCompatibility = JavaVersion.VERSION_23
+}
+
 repositories {
     mavenCentral()
 }
@@ -27,9 +32,4 @@ dependencies {
 tasks.named<Test>("test") {
     jvmArgs("-XX:+EnableDynamicAgentLoading")
     useJUnitPlatform()
-}
-
-// Make the compile task depend on the annotation processing
-tasks.compileJava {
-    options.compilerArgs.add("-Xlint:unchecked")
 }

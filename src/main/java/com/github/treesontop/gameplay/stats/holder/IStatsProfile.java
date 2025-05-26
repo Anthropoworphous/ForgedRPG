@@ -3,6 +3,9 @@ package com.github.treesontop.gameplay.stats.holder;
 import com.github.treesontop.Main;
 import com.github.treesontop.gameplay.stats.impl.def.Armor;
 import com.github.treesontop.gameplay.stats.impl.def.Resistance;
+import com.github.treesontop.gameplay.stats.impl.dmg.TrueDamage;
+import com.github.treesontop.gameplay.stats.impl.dodge.ArtDodge;
+import com.github.treesontop.gameplay.stats.impl.dodge.PhysicDodge;
 import com.github.treesontop.gameplay.stats.impl.dmg.art.Art;
 import com.github.treesontop.gameplay.stats.impl.dmg.penetration.art.Tenacity;
 import com.github.treesontop.gameplay.stats.impl.dmg.penetration.phy.Pierce;
@@ -11,6 +14,7 @@ import com.github.treesontop.gameplay.stats.impl.dmg.phy.Puncture;
 import com.github.treesontop.gameplay.stats.impl.dmg.phy.Slash;
 import com.github.treesontop.gameplay.stats.impl.heal.regen.HealthRegen;
 import com.github.treesontop.gameplay.stats.impl.hp.Health;
+import com.github.treesontop.gameplay.stats.impl.hp.Shield;
 
 /**
  * Hold every possible stats
@@ -43,16 +47,21 @@ public interface IStatsProfile {
 
     // health
     Health hp();
+    Shield shield();
 
     // defence
     Armor armor();
     Resistance res();
+    // L___dodge
+    PhysicDodge physicDodge();
+    ArtDodge artDodge();
 
     // regen
     HealthRegen hp_r();
 
     // atk
     // L___phy
+    TrueDamage trueDamage();
     Slash slash();
     Blunt blunt();
     Puncture puncture();
@@ -69,15 +78,25 @@ public interface IStatsProfile {
         default Health hp() {
             return new Health(100);
         }
+        @Override
+        default Shield shield() { return Shield.none; }
 
         @Override
         default Armor armor() {
-            return new Armor(0);
+            return Armor.none;
+        }
+        @Override
+        default Resistance res() {
+            return Resistance.none;
         }
 
         @Override
-        default Resistance res() {
-            return new Resistance(0);
+        default PhysicDodge physicDodge() {
+            return PhysicDodge.none;
+        }
+        @Override
+        default ArtDodge artDodge() {
+            return ArtDodge.none;
         }
 
         @Override
@@ -91,15 +110,25 @@ public interface IStatsProfile {
         default Health hp() {
             return new Health.InfiniteHP();
         }
+        @Override
+        default Shield shield() { return new Shield(0); }
 
         @Override
         default Armor armor() {
             return Armor.none;
         }
-
         @Override
         default Resistance res() {
             return Resistance.none;
+        }
+
+        @Override
+        default PhysicDodge physicDodge() {
+            return new PhysicDodge(0);
+        }
+        @Override
+        default ArtDodge artDodge() {
+            return new ArtDodge(0);
         }
 
         @Override
@@ -114,6 +143,8 @@ public interface IStatsProfile {
             return Art.none;
         }
 
+        @Override
+        default TrueDamage trueDamage() { return TrueDamage.none; }
         @Override
         default Slash slash() {
             return Slash.none;
