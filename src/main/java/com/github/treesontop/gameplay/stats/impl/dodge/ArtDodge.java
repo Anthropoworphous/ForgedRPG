@@ -4,6 +4,8 @@ import com.github.treesontop.gameplay.stats.impl.BasicLender;
 import com.github.treesontop.gameplay.stats.impl.IStaticStat;
 
 public class ArtDodge extends BasicLender implements IStaticStat, IDodge {
+    public static final ArtDodge none = new ArtDodge(0);
+
     public ArtDodge(float max) {
         super(max);
     }

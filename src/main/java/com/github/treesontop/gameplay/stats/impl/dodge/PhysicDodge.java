@@ -5,10 +5,11 @@ import com.github.treesontop.gameplay.stats.impl.IStaticStat;
 
 
 public class PhysicDodge extends BasicLender implements IStaticStat, IDodge {
+    public static final PhysicDodge none = new PhysicDodge(0);
+
     public PhysicDodge(float max) {
         super(max);
     }
-
 
     @Override
     public boolean dodged(StatsSnapshot source, StatsSnapshot self) {

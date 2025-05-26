@@ -5,6 +5,8 @@ import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
 import com.github.treesontop.gameplay.stats.impl.BasicLender;
 
 public class Shield extends BasicLender implements IStats {
+    public static final Shield none = new Shield(0);
+
     public Shield(float value) {
         super(value);
     }

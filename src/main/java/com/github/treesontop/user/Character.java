@@ -6,6 +6,7 @@ import com.github.treesontop.gameplay.stats.component.StatsRange;
 import com.github.treesontop.gameplay.stats.holder.IStatsProfile;
 import com.github.treesontop.gameplay.stats.holder.StatsHolder;
 import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
+import com.github.treesontop.gameplay.stats.impl.dmg.TrueDamage;
 import com.github.treesontop.gameplay.stats.impl.dmg.art.Art;
 import com.github.treesontop.gameplay.stats.impl.dmg.penetration.art.Tenacity;
 import com.github.treesontop.gameplay.stats.impl.dmg.penetration.phy.Pierce;
@@ -40,6 +41,10 @@ public class Character extends StatsHolder implements IStatsProfile.IDefaultStat
     }
 
     @Override
+    public TrueDamage trueDamage() {
+        return TrueDamage.none;
+    }
+    @Override
     public Slash slash() {
         return slash.value();
     }
@@ -60,11 +65,8 @@ public class Character extends StatsHolder implements IStatsProfile.IDefaultStat
     public Pierce pierce() {
         return new Pierce(0);
     }
-
-
     @Override
     public Tenacity tenacity() {
         return new Tenacity(0);
     }
-
 }
