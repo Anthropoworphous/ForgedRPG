@@ -33,3 +33,7 @@ tasks.named<Test>("test") {
 tasks.compileJava {
     options.compilerArgs.add("-Xlint:unchecked")
 }
+
+tasks.wrapper {
+    gradleVersion = "v8.14.1"
+}

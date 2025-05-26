@@ -14,8 +14,7 @@ public record StatsSnapshot(
     IStatsProfile profile,
     Map<Class<? extends IStats>, Float> value
 ) {
-
-
+    @SuppressWarnings("unchecked")
     public StatsSnapshot(IStatsProfile profile) {
         this(profile, new HashMap<>());
         for (Method m : profile.getClass().getMethods()) {
@@ -27,7 +26,6 @@ public record StatsSnapshot(
                 if (!stats.needValue()) continue;
                 var def = stats.defaultValue();
                 //Should be checked already by the isAssignableFrom statement
-                //noinspection unchecked
                 value.put((Class<? extends IStats>) returnType, def);
                 Main.logger.info("%s default to %s".formatted(m.getName(), def));
             } catch (Exception e) {
