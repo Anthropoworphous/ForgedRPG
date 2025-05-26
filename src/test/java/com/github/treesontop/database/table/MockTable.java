@@ -7,7 +7,7 @@ import com.github.treesontop.database.generator.GenerateTable;
 import com.github.treesontop.database.generator.MakeColumn;
 
 @Util.DoNotScan
-@GenerateTable(name = "test_table")
+@GenerateTable(value = "test_table")
 public class MockTable {
     public static Table table;
 

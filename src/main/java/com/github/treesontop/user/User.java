@@ -1,5 +1,6 @@
 package com.github.treesontop.user;
 
+import com.github.treesontop.Main;
 import com.github.treesontop.database.Column;
 import com.github.treesontop.database.SQLDataType;
 import com.github.treesontop.database.data.SQLInt;
@@ -15,11 +16,11 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.logging.Logger;
 
-@GenerateTable(name = "user")
+
+@GenerateTable("user")
 public class User {
-    private static final Logger logger = Logger.getGlobal();
+
     private static final Map<UUID, User> users = new HashMap<>();
 
     private static Table table;
@@ -50,7 +51,7 @@ public class User {
     }
 
     public static User load(Player player) throws SQLException {
-        logger.info("Loading player " + player.getUsername() + " @" + player.getUuid());
+        Main.logger.info("Loading player " + player.getUsername() + " @" + player.getUuid());
         var uuid = player.getUuid();
 
         var resultSet = table.findExact(
@@ -81,7 +82,7 @@ public class User {
     public static void save(Player player) throws SQLException {
         var uuid = player.getUuid();
         var user = users.remove(uuid);
-        logger.info("Saving player " + player.getUsername() + " @" + uuid);
+        Main.logger.info("Saving player " + player.getUsername() + " @" + uuid);
 
         var mode = switch (player.getGameMode()) {
             case GameMode.SURVIVAL -> 0;
@@ -95,7 +96,7 @@ public class User {
             table.column("gamemode").fill(new SQLInt(SQLDataType.BYTE, mode))
         );
 
-        logger.info("Data: [%s]".formatted(row.toString()));
+        Main.logger.info("Data: [%s]".formatted(row.toString()));
 
         table.insert().insert(row).execute();
     }

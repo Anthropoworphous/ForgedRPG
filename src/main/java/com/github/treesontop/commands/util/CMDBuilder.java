@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
+
 
 public class CMDBuilder {
-    private static final Logger logger = Logger.getGlobal();
+
 
     byte counts = 0;
     final List<CommandExecutor> executor = new ArrayList<>();

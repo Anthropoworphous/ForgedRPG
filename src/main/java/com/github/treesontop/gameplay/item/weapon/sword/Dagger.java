@@ -10,7 +10,7 @@ import net.minestom.server.item.ItemStack;
 
 import java.util.Map;
 
-@ItemManager.Register("dagger")
+@ItemManager.Register("weapon/sword/dagger")
 public class Dagger implements ISword {
     private final StatsDistributor<IAttack> distributor = new StatsDistributor<>(IAttack.class);
 

@@ -1,5 +1,6 @@
 package com.github.treesontop.events;
 
+import com.github.treesontop.Main;
 import net.minestom.server.event.Event;
 import net.minestom.server.event.EventListener;
 import net.minestom.server.event.GlobalEventHandler;
@@ -7,11 +8,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 @SuppressWarnings("unchecked")
 public abstract class EventBase<E extends Event> implements EventListener<E> {
-    private static final Logger logger = Logger.getGlobal();
+
 
     /**
      * Executes the event.
@@ -27,7 +28,7 @@ public abstract class EventBase<E extends Event> implements EventListener<E> {
         try {
             return execute(event);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error executing event: " + event.getClass().getName(), e);
+            Main.logger.log(Level.SEVERE, "Error executing event: " + event.getClass().getName(), e);
             return Result.EXCEPTION;
         }
     }

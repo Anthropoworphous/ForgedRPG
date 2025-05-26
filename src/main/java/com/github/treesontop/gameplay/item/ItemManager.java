@@ -1,5 +1,6 @@
 package com.github.treesontop.gameplay.item;
 
+import com.github.treesontop.Main;
 import com.github.treesontop.Util;
 import net.minestom.server.item.ItemStack;
 import net.minestom.server.tag.Tag;
@@ -12,26 +13,19 @@ import java.util.Optional;
 public class ItemManager {
     private static final Map<String, IGameItem> itemRegistry = new HashMap<>();
 
-    static {
+    public static void registerAllItems() {
         var classes = Util.getAnnotatedClass("com.github.treesontop.gameplay.item", Register.class);
+        Main.logger.info("Item to register: " + classes.size());
         for (var c : classes) {
             try {
                 if (c.isInterface()) continue;
                 var item = c.getConstructor().newInstance();
                 if (!(item instanceof IGameItem gameItem)) continue;
 
-                var id = new StringBuilder();
-                var cSup = c;
-                do {
-                    Register annotation = cSup.getAnnotation(Register.class);
-                    if (annotation != null) {
-                        String value = annotation.value();
-                        if (value != null) id.insert(0, value + "/");
-                    }
-                    cSup = cSup.getSuperclass();
-                } while (cSup != null);
+                var id = c.getAnnotation(Register.class).value();
                 gameItem.init();
-                itemRegistry.put(id.toString(), gameItem);
+                itemRegistry.put(id, gameItem);
+                Main.logger.info("Item %s registered".formatted(id));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

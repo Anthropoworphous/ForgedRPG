@@ -5,11 +5,9 @@ import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
 import com.github.treesontop.gameplay.stats.impl.BasicLender;
 import com.github.treesontop.gameplay.stats.lease.StatsBorrower;
 
-import java.util.logging.Logger;
+
 
 public class Health extends BasicLender implements IStats {
-    private static final Logger logger = Logger.getGlobal();
-
     public Health(float max) {
         super(max);
     }
@@ -40,13 +38,11 @@ public class Health extends BasicLender implements IStats {
 
         @Override
         public float consume(StatsSnapshot self, float value) {
-            logger.info("hit for " + value);
             return 1;
         }
 
         @Override
         public float provide(StatsSnapshot self, float value) {
-            logger.info("heal for " + value);
             return 1;
         }
 

@@ -13,8 +13,8 @@ public class Blunt extends BasicLender implements IStaticStat, IPhysical {
     }
 
     @Override
-    public void damage(StatsSnapshot source, StatsSnapshot target) {
+    public float damage(StatsSnapshot source, StatsSnapshot target) {
         var p = target.profile();
-        p.hp().consume(target, p.armor().tank(source, target, source.profile().blunt().randomInRange()));
+        return p.armor().tank(source, target, source.profile().blunt().randomInRange());
     }
 }

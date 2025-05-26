@@ -10,5 +10,5 @@ public interface IAttack extends IStats {
         return leaseManager().initialRange();
     }
 
-    void damage(StatsSnapshot source, StatsSnapshot target);
+    float damage(StatsSnapshot source, StatsSnapshot target);
 }

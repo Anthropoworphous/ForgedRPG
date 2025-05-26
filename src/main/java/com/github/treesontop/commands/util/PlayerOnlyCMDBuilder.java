@@ -1,5 +1,6 @@
 package com.github.treesontop.commands.util;
 
+import com.github.treesontop.Main;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.CommandExecutor;
@@ -9,10 +10,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 public class PlayerOnlyCMDBuilder extends CMDBuilder {
-    private static final Logger logger = Logger.getGlobal();
+
 
     /**
      * Implements a command with the provided player executor, annotation, and arguments.
@@ -49,7 +50,7 @@ public class PlayerOnlyCMDBuilder extends CMDBuilder {
                 apply(p, context);
             } else {
                 String errorMessage = "This command can only be executed by a player!";
-                logger.log(Level.WARNING, errorMessage);
+                Main.logger.log(Level.WARNING, errorMessage);
                 sender.sendMessage(errorMessage);
             }
         }
