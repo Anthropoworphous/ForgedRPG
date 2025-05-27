@@ -10,6 +10,7 @@ import com.github.treesontop.events.EventBase;
 import com.github.treesontop.events.RegisterEvent;
 import com.github.treesontop.gameplay.entity.IGameEntity;
 import com.github.treesontop.gameplay.item.ItemManager;
+import com.github.treesontop.gameplay.stats.cycle.StatsCycle;
 import com.github.treesontop.user.Character;
 import com.github.treesontop.user.User;
 import net.minestom.server.MinecraftServer;
@@ -47,6 +48,7 @@ public class Main {
         ItemManager.registerAllItems();
 
         startUp(minecraftServer = MinecraftServer.init());
+        StatsCycle.startCycle();
         Character.startUIElementUpdate();
     }
 

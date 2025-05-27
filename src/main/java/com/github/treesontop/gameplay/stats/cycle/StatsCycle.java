@@ -1,13 +1,13 @@
 package com.github.treesontop.gameplay.stats.cycle;
 
-import net.minestom.server.timer.Scheduler;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.timer.TaskSchedule;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class StatsCycle {
-    public static final float delta = 0.05f;
+    public static final float delta = 0.25f;
 
     private static final Set<ICycleListener> listeners = new HashSet<>();
 
@@ -19,9 +19,9 @@ public class StatsCycle {
     }
 
     public static void startCycle() {
-        Scheduler.newScheduler().scheduleTask(() -> {
+        MinecraftServer.getSchedulerManager().scheduleTask(() -> {
             if (listeners.isEmpty()) return;
             listeners.forEach(ICycleListener::onCycle);
-        }, TaskSchedule.immediate(), TaskSchedule.tick(1));
+        }, TaskSchedule.nextTick(), TaskSchedule.tick(5));
     }
 }

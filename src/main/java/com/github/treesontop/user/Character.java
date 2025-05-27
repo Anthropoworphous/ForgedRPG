@@ -18,12 +18,11 @@ import com.github.treesontop.gameplay.stats.impl.hp.Health;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
-import net.kyori.adventure.text.format.TextDecoration;
-import net.minestom.server.timer.Scheduler;
+import net.minestom.server.MinecraftServer;
 import net.minestom.server.timer.TaskSchedule;
 
 public class Character extends StatsHolder implements IDefaultStatsProfile, IPlayerWearer {
-    private static final int totalHealthBarLength = 30;
+    private static final int totalHealthBarLength = 20;
 
     private final User user;
 
@@ -36,21 +35,19 @@ public class Character extends StatsHolder implements IDefaultStatsProfile, IPla
     private final Util.Cache.UpdateTrigger updateTrigger;
 
     public static void startUIElementUpdate() {
-        var scheduler = Scheduler.newScheduler();
-
-        var task = scheduler.submitTask(() -> {
-            Main.instances.values().stream()
-                .flatMap(world -> world.getPlayers().stream())
-                .forEach(player -> {
-                    var actionBar = Component.text();
-                    var character = User.find(player).character;
-                    var hp = Math.round(character.health().range().max() / character.snapshot().get(Health.class) * totalHealthBarLength);
-                    actionBar.append(Component.text("Health: ", Style.style(NamedTextColor.RED, TextDecoration.BOLD)))
-                        .append(Component.text("|".repeat(hp), Style.style(NamedTextColor.RED, TextDecoration.BOLD)))
-                        .append(Component.text("|".repeat(totalHealthBarLength - hp), Style.style(NamedTextColor.DARK_GRAY, TextDecoration.BOLD)));
-                });
-            return TaskSchedule.tick(5);
-        });
+        MinecraftServer.getSchedulerManager().scheduleTask(() -> Main.instances.values().stream()
+            .flatMap(world -> world.getPlayers().stream())
+            .forEach(player -> {
+                var character = User.find(player).character;
+                var hp = character.snapshot().get(Health.class);
+                var maxHp = character.health().range().max();
+                var hpBar = Math.round(hp / maxHp * totalHealthBarLength);
+                var actionBar = Component.text();
+                actionBar.append(
+                    Component.text("Health: [%s|%s]".formatted(hp, maxHp),
+                    Style.style(NamedTextColor.RED)));
+                player.sendActionBar(actionBar);
+            }), TaskSchedule.nextTick(), TaskSchedule.tick(5));
     }
 
     public Character(User user) {
