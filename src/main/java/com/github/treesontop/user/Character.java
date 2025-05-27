@@ -1,11 +1,12 @@
 package com.github.treesontop.user;
 
+import com.github.treesontop.Main;
 import com.github.treesontop.Util;
 import com.github.treesontop.gameplay.inventory.equipment.IPlayerWearer;
 import com.github.treesontop.gameplay.stats.component.StatsRange;
-import com.github.treesontop.gameplay.stats.holder.IStatsProfile;
 import com.github.treesontop.gameplay.stats.holder.StatsHolder;
 import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
+import com.github.treesontop.gameplay.stats.holder.profiles.IDefaultStatsProfile;
 import com.github.treesontop.gameplay.stats.impl.dmg.TrueDamage;
 import com.github.treesontop.gameplay.stats.impl.dmg.art.Art;
 import com.github.treesontop.gameplay.stats.impl.dmg.penetration.art.Tenacity;
@@ -13,8 +14,17 @@ import com.github.treesontop.gameplay.stats.impl.dmg.penetration.phy.Pierce;
 import com.github.treesontop.gameplay.stats.impl.dmg.phy.Blunt;
 import com.github.treesontop.gameplay.stats.impl.dmg.phy.Puncture;
 import com.github.treesontop.gameplay.stats.impl.dmg.phy.Slash;
+import com.github.treesontop.gameplay.stats.impl.hp.Health;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.minestom.server.timer.Scheduler;
+import net.minestom.server.timer.TaskSchedule;
 
-public class Character extends StatsHolder implements IStatsProfile.IDefaultStatsProfile, IPlayerWearer {
+public class Character extends StatsHolder implements IDefaultStatsProfile, IPlayerWearer {
+    private static final int totalHealthBarLength = 30;
+
     private final User user;
 
     private final Util.Cache<Slash> slash;
@@ -22,7 +32,26 @@ public class Character extends StatsHolder implements IStatsProfile.IDefaultStat
     private final Util.Cache<Puncture> puncture;
     private final Util.Cache<Art> art;
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final Util.Cache.UpdateTrigger updateTrigger;
+
+    public static void startUIElementUpdate() {
+        var scheduler = Scheduler.newScheduler();
+
+        var task = scheduler.submitTask(() -> {
+            Main.instances.values().stream()
+                .flatMap(world -> world.getPlayers().stream())
+                .forEach(player -> {
+                    var actionBar = Component.text();
+                    var character = User.find(player).character;
+                    var hp = Math.round(character.health().range().max() / character.snapshot().get(Health.class) * totalHealthBarLength);
+                    actionBar.append(Component.text("Health: ", Style.style(NamedTextColor.RED, TextDecoration.BOLD)))
+                        .append(Component.text("|".repeat(hp), Style.style(NamedTextColor.RED, TextDecoration.BOLD)))
+                        .append(Component.text("|".repeat(totalHealthBarLength - hp), Style.style(NamedTextColor.DARK_GRAY, TextDecoration.BOLD)));
+                });
+            return TaskSchedule.tick(5);
+        });
+    }
 
     public Character(User user) {
         this.user = user;

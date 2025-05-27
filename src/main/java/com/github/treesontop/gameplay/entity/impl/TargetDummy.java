@@ -2,9 +2,10 @@ package com.github.treesontop.gameplay.entity.impl;
 
 import com.github.treesontop.gameplay.entity.IGameEntity;
 import com.github.treesontop.gameplay.entity.RegisterEntity;
-import com.github.treesontop.gameplay.stats.holder.IStatsProfile;
 import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
 import com.github.treesontop.gameplay.stats.holder.StatsHolder;
+import com.github.treesontop.gameplay.stats.holder.profiles.INoAttackProfile;
+import com.github.treesontop.gameplay.stats.holder.profiles.IUnkillableProfile;
 import net.minestom.server.coordinate.Pos;
 import net.minestom.server.entity.Entity;
 import net.minestom.server.entity.EntityType;
@@ -13,7 +14,7 @@ import net.minestom.server.instance.Instance;
 import static com.github.treesontop.gameplay.entity.impl.TargetDummy.tag;
 
 @RegisterEntity(tag)
-public class TargetDummy extends StatsHolder implements IGameEntity, IStatsProfile.IUnkillableProfile, IStatsProfile.INoAttackProfile {
+public class TargetDummy extends StatsHolder implements IGameEntity, IUnkillableProfile, INoAttackProfile {
     public static final String tag = "dummy";
 
     @Override

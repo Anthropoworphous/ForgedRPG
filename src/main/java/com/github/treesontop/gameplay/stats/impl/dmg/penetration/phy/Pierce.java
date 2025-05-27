@@ -13,7 +13,12 @@ public class Pierce extends BasicLender implements IPenetration {
 
     @Override
     public float penetrate(StatsSnapshot source, float resistance) {
-        var pierce = Math.max(1, 1 - Math.min(0, source.profile().pierce().maxInRange() / 100));
+        var pierce = Math.max(1, 1 - Math.min(0, source.profile().pierce().value() / 100));
         return resistance * pierce;
+    }
+
+    @Override
+    public float value() {
+        return maxInRange();
     }
 }

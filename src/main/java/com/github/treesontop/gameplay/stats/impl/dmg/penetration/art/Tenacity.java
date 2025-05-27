@@ -13,7 +13,12 @@ public class Tenacity extends BasicLender implements IPenetration {
 
     @Override
     public float penetrate(StatsSnapshot source, float resistance) {
-        return Math.min(0, resistance - source.profile().tenacity().maxInRange());
+        return Math.min(0, resistance - source.profile().tenacity().value());
+    }
+
+    @Override
+    public float value() {
+        return maxInRange();
     }
 }
 
