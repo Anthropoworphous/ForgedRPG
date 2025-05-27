@@ -45,10 +45,5 @@ public class Health extends BasicLender implements IStats {
         public float provide(StatsSnapshot self, float value) {
             return 1;
         }
-
-        @Override
-        public boolean needValue() {
-            return false;
-        }
     }
 }

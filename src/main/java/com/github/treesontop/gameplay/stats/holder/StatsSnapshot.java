@@ -2,6 +2,8 @@ package com.github.treesontop.gameplay.stats.holder;
 
 import com.github.treesontop.Main;
 import com.github.treesontop.gameplay.stats.IStats;
+import com.github.treesontop.gameplay.stats.impl.IStaticStats;
+import com.github.treesontop.gameplay.stats.impl.hp.Health;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 import java.lang.reflect.Method;
@@ -23,7 +25,7 @@ public record StatsSnapshot(
 
             try {
                 var stats = (IStats) m.invoke(profile);
-                if (!stats.needValue()) continue;
+                if (stats instanceof IStaticStats) continue; // static stats don't need fluctuating value
                 var def = stats.defaultValue();
                 //Should be checked already by the isAssignableFrom statement
                 value.put((Class<? extends IStats>) returnType, def);
@@ -34,11 +36,18 @@ public record StatsSnapshot(
         }
     }
 
+    private static void noneStaticCheck(Class<? extends IStats> type) {
+        if (IStaticStats.class.isAssignableFrom(type))
+            throw new RuntimeException("Attempting to get fluctuating value for static stats");
+    }
+
     public float get(Class<? extends IStats> type) {
+        noneStaticCheck(type);
         return value.get(type);
     }
 
     public void set(Class<? extends IStats> type, float newValue) {
+        noneStaticCheck(type);
         value.put(type, newValue);
     }
 
@@ -46,6 +55,7 @@ public record StatsSnapshot(
      * @return the new value or null if no mapping present
      */
     public Float add(Class<? extends IStats> type, float toAdd) {
+        noneStaticCheck(type);
         return value.computeIfPresent(type, (ignored, old) -> old + toAdd);
     }
 
@@ -54,8 +64,15 @@ public record StatsSnapshot(
      */
     @CanIgnoreReturnValue
     public float edit(Class<? extends IStats> type, Function<Float, Float> editor) {
+        noneStaticCheck(type);
         var old = value.get(type);
         value.put(type, editor.apply(old));
         return old;
+    }
+
+
+
+    public boolean isDead() {
+        return value.get(Health.class) <= 0;
     }
 }

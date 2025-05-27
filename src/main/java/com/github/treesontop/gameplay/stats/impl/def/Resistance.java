@@ -2,9 +2,9 @@ package com.github.treesontop.gameplay.stats.impl.def;
 
 import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
 import com.github.treesontop.gameplay.stats.impl.BasicLender;
-import com.github.treesontop.gameplay.stats.impl.IStaticStat;
+import com.github.treesontop.gameplay.stats.impl.IStaticStats;
 
-public class Resistance extends BasicLender implements IStaticStat, IDefence {
+public class Resistance extends BasicLender implements IStaticStats, IDefence {
     public static final Resistance none = new Resistance(0);
 
     public Resistance(float max) {

@@ -5,6 +5,7 @@ import org.beryx.textio.TextTerminal;
 
 import java.util.Arrays;
 import java.util.logging.Handler;
+import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ public class Console {
     private static final Util.Cache<Boolean> logDamage = new Util.Cache<>(() -> Main.env.containsKey("log_damage"));
 
     public static void link() {
+        LogManager.getLogManager().reset();
         Logger.getGlobal().addHandler(new Handler() {
             @Override
             public void publish(LogRecord record) {

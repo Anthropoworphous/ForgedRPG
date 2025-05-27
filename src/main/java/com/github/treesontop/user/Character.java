@@ -1,11 +1,12 @@
 package com.github.treesontop.user;
 
+import com.github.treesontop.Main;
 import com.github.treesontop.Util;
 import com.github.treesontop.gameplay.inventory.equipment.IPlayerWearer;
 import com.github.treesontop.gameplay.stats.component.StatsRange;
-import com.github.treesontop.gameplay.stats.holder.IStatsProfile;
 import com.github.treesontop.gameplay.stats.holder.StatsHolder;
 import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
+import com.github.treesontop.gameplay.stats.holder.profiles.IDefaultStatsProfile;
 import com.github.treesontop.gameplay.stats.impl.dmg.TrueDamage;
 import com.github.treesontop.gameplay.stats.impl.dmg.art.Art;
 import com.github.treesontop.gameplay.stats.impl.dmg.penetration.art.Tenacity;
@@ -13,8 +14,16 @@ import com.github.treesontop.gameplay.stats.impl.dmg.penetration.phy.Pierce;
 import com.github.treesontop.gameplay.stats.impl.dmg.phy.Blunt;
 import com.github.treesontop.gameplay.stats.impl.dmg.phy.Puncture;
 import com.github.treesontop.gameplay.stats.impl.dmg.phy.Slash;
+import com.github.treesontop.gameplay.stats.impl.hp.Health;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.minestom.server.MinecraftServer;
+import net.minestom.server.timer.TaskSchedule;
 
-public class Character extends StatsHolder implements IStatsProfile.IDefaultStatsProfile, IPlayerWearer {
+public class Character extends StatsHolder implements IDefaultStatsProfile, IPlayerWearer {
+    private static final int totalHealthBarLength = 20;
+
     private final User user;
 
     private final Util.Cache<Slash> slash;
@@ -22,7 +31,24 @@ public class Character extends StatsHolder implements IStatsProfile.IDefaultStat
     private final Util.Cache<Puncture> puncture;
     private final Util.Cache<Art> art;
 
+    @SuppressWarnings("FieldCanBeLocal")
     private final Util.Cache.UpdateTrigger updateTrigger;
+
+    public static void startUIElementUpdate() {
+        MinecraftServer.getSchedulerManager().scheduleTask(() -> Main.instances.values().stream()
+            .flatMap(world -> world.getPlayers().stream())
+            .forEach(player -> {
+                var character = User.find(player).character;
+                var hp = character.snapshot().get(Health.class);
+                var maxHp = character.health().range().max();
+                var hpBar = Math.round(hp / maxHp * totalHealthBarLength);
+                var actionBar = Component.text();
+                actionBar.append(
+                    Component.text("Health: [%s|%s]".formatted(hp, maxHp),
+                    Style.style(NamedTextColor.RED)));
+                player.sendActionBar(actionBar);
+            }), TaskSchedule.nextTick(), TaskSchedule.tick(5));
+    }
 
     public Character(User user) {
         this.user = user;

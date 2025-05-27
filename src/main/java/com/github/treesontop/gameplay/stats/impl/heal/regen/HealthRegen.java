@@ -1,11 +1,11 @@
 package com.github.treesontop.gameplay.stats.impl.heal.regen;
 
-import com.github.treesontop.gameplay.stats.StatsCycle;
+import com.github.treesontop.gameplay.stats.cycle.StatsCycle;
 import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
 import com.github.treesontop.gameplay.stats.impl.BasicLender;
-import com.github.treesontop.gameplay.stats.impl.IStaticStat;
+import com.github.treesontop.gameplay.stats.impl.IStaticStats;
 
-public class HealthRegen extends BasicLender implements IStaticStat, IRegen {
+public class HealthRegen extends BasicLender implements IStaticStats, IRegen {
     public static final HealthRegen none = new HealthRegen(0);
 
     public HealthRegen(float max) {
@@ -14,6 +14,11 @@ public class HealthRegen extends BasicLender implements IStaticStat, IRegen {
 
     @Override
     public void regen(StatsSnapshot self) {
-        self.profile().hp().provide(self, self.get(HealthRegen.class) * StatsCycle.delta);
+        self.profile().health().provide(self, self.profile().healthRegen().value() * StatsCycle.delta);
+    }
+
+    @Override
+    public float value() {
+        return maxInRange();
     }
 }

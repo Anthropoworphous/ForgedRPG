@@ -13,10 +13,8 @@ public interface IStats {
     StatsRange range();
 
     default float defaultValue() {
-        if (!needValue()) throw new RuntimeException("No value should be defined for this stat");
         return range().max();
     }
-    default boolean needValue() { return true; }
 
     /**
      * Reduce value of stats base on stats and input
