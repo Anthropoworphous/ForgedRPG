@@ -2,13 +2,13 @@ package com.github.treesontop.gameplay.stats;
 
 import com.github.treesontop.gameplay.stats.component.StatsRange;
 import com.github.treesontop.gameplay.stats.holder.StatsSnapshot;
-import com.github.treesontop.gameplay.stats.lease.IStatLeaseManager;
+import com.github.treesontop.gameplay.stats.lease.IStatsLeaseManager;
 import com.github.treesontop.gameplay.stats.lease.StatsBorrower;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 
 //NOTE: snapshot.value().get() should only be call with the caller itself.
 public interface IStats {
-    IStatLeaseManager leaseManager();
+    IStatsLeaseManager leaseManager();
 
     StatsRange range();
 

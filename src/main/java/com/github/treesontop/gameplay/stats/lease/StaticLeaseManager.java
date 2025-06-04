@@ -2,7 +2,7 @@ package com.github.treesontop.gameplay.stats.lease;
 
 import com.github.treesontop.gameplay.stats.component.StatsRange;
 
-public class StaticLeaseManager implements IStatLeaseManager {
+public class StaticLeaseManager implements IStatsLeaseManager {
     private final StatsRange range;
 
     private StaticLeaseManager(StatsRange currentRange) {

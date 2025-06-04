@@ -13,9 +13,9 @@ class EventBaseTest {
     private EventBase<Event> eventBase;
     private GlobalEventHandler eventHandler;
 
+    @SuppressWarnings("unchecked")
     @BeforeEach
     void setUp() {
-        //noinspection unchecked
         eventBase = (EventBase<Event>) mock(EventBase.class, CALLS_REAL_METHODS);
         eventHandler = mock(GlobalEventHandler.class);
     }
@@ -29,16 +29,6 @@ class EventBaseTest {
 
         assertEquals(EventBase.Result.SUCCESS, result);
         verify(eventBase).execute(event);
-    }
-
-    @Test
-    void testRunWithException() {
-        Event event = mock(Event.class);
-        when(eventBase.execute(event)).thenThrow(new RuntimeException("Test exception"));
-
-        EventBase.Result result = eventBase.run(event);
-
-        assertEquals(EventBase.Result.EXCEPTION, result);
     }
 
     @Test

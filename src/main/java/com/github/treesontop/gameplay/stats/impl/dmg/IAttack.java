@@ -11,4 +11,13 @@ public interface IAttack extends IStats {
     }
 
     float damage(StatsSnapshot source, StatsSnapshot target);
+
+    @SuppressWarnings("unchecked")
+    default <T extends IAttack> T noAttack(Class<T> clazz) {
+        try {
+            return (T) clazz.getField("none").get(null);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

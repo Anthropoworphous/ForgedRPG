@@ -1,32 +1,20 @@
 package com.github.treesontop.database;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.InvalidObjectException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class DataBaseTest {
-    private Connection connection;
-
-    @BeforeEach
-    public void setUp() throws SQLException, InvalidObjectException {
-        connection = DataBase.setupMemoryDataBase();
-    }
-
     @Test
-    public void testSetupDataBase() {
-        assertNotNull(connection);
-    }
-
-    @Test
-    public void testGetStatement() throws SQLException {
-        PreparedStatement statement = DataBase.getStatement("SELECT 1");
-        assertNotNull(statement);
+    public void testGetStatement() throws SQLException, InvalidObjectException {
+        DataBase.setupMemoryDataBase();
+        var qry = DataBase.getStatement("SELECT 1");
+        qry.execute();
+        assertEquals(1, qry.getResultSet().getInt(1));
     }
 
     @Test

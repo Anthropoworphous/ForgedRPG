@@ -2,21 +2,21 @@ package com.github.treesontop.gameplay.stats.impl;
 
 import com.github.treesontop.gameplay.stats.IStats;
 import com.github.treesontop.gameplay.stats.component.StatsRange;
-import com.github.treesontop.gameplay.stats.lease.IStatLeaseManager;
-import com.github.treesontop.gameplay.stats.lease.StatLeaseManager;
+import com.github.treesontop.gameplay.stats.lease.IStatsLeaseManager;
+import com.github.treesontop.gameplay.stats.lease.StatsLeaseManager;
 
 public abstract class BasicLender implements IStats {
-    private final StatLeaseManager manager;
+    private final StatsLeaseManager manager;
 
     public BasicLender(float max) {
         this(new StatsRange(0, max));
     }
     public BasicLender(StatsRange range) {
-        manager = new StatLeaseManager(range);
+        manager = new StatsLeaseManager(range);
     }
 
     @Override
-    public IStatLeaseManager leaseManager() {
+    public IStatsLeaseManager leaseManager() {
         return manager;
     }
 

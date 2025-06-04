@@ -1,14 +1,15 @@
 package com.github.treesontop.gameplay.inventory.equipment;
 
-import com.github.treesontop.gameplay.item.weapon.IWeaponItem;
+import com.github.treesontop.gameplay.item.weapon.WeaponItem;
 import com.github.treesontop.gameplay.stats.holder.IStatsProfile;
+import com.github.treesontop.gameplay.stats.holder.profiles.IWeaponHolder;
 import com.github.treesontop.user.User;
 
-public interface IPlayerWearer extends IEquipmentWearer, IStatsProfile {
+public interface IPlayerWearer extends IWeaponHolder, IStatsProfile {
     User user();
 
     @Override
-    public default IWeaponItem weapon() {
-        return IWeaponItem.getWeapon(user().player.getItemInMainHand());
+    default WeaponItem weapon() {
+        return new WeaponItem(user().player.getItemInMainHand());
     }
 }

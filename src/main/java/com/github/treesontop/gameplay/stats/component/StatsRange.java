@@ -1,18 +1,10 @@
 package com.github.treesontop.gameplay.stats.component;
 
-public class StatsRange {
-    private final float min, max;
+public record StatsRange(float min, float max) {
+    public static final StatsRange none = new StatsRange(0);
 
-    public static final StatsRange to1 = new StatsRange(0, 1);
-    public static final StatsRange to100 = new StatsRange(0, 100);
-
-    public StatsRange(float min, float max) {
-        this.min = min;
-        this.max = max;
-    }
     public StatsRange(float of) {
-        this.min = of;
-        this.max = of;
+        this(of, of);
     }
 
     public float min() {

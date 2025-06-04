@@ -4,7 +4,7 @@ public class StatsBorrower {
     public final float requested;
     public final boolean allOrNothing;
 
-    private IStatLeaseManager source;
+    private IStatsLeaseManager source;
     private float obtained = 0;
 
 
@@ -13,7 +13,7 @@ public class StatsBorrower {
         this.allOrNothing = allOrNothing;
     }
 
-    public void acquire(IStatLeaseManager source, float value) {
+    public void acquire(IStatsLeaseManager source, float value) {
         this.source = source;
         obtained = value;
     }

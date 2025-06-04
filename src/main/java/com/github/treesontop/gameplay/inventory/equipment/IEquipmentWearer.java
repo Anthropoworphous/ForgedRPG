@@ -1,7 +1,7 @@
 package com.github.treesontop.gameplay.inventory.equipment;
 
-import com.github.treesontop.gameplay.item.weapon.IWeaponItem;
+import com.github.treesontop.gameplay.item.weapon.WeaponItem;
 
 public interface IEquipmentWearer {
-    IWeaponItem weapon();
+    WeaponItem weapon();
 }

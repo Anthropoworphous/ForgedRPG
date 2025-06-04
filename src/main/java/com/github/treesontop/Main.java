@@ -9,7 +9,6 @@ import com.github.treesontop.database.generator.TableGenerator;
 import com.github.treesontop.events.EventBase;
 import com.github.treesontop.events.RegisterEvent;
 import com.github.treesontop.gameplay.entity.IGameEntity;
-import com.github.treesontop.gameplay.item.ItemManager;
 import com.github.treesontop.gameplay.stats.cycle.StatsCycle;
 import com.github.treesontop.user.Character;
 import com.github.treesontop.user.User;
@@ -45,7 +44,6 @@ public class Main {
         Console.link();
         DataBase.connectToDB();
         TableGenerator.generate(Util.getAnnotatedClass("com.github.treesontop", GenerateTable.class));
-        ItemManager.registerAllItems();
 
         startUp(minecraftServer = MinecraftServer.init());
         StatsCycle.startCycle();

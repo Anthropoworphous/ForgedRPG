@@ -5,12 +5,12 @@ import com.github.treesontop.gameplay.stats.component.StatsRange;
 import java.util.ArrayList;
 import java.util.List;
 
-public class StatLeaseManager implements IStatLeaseManager {
+public class StatsLeaseManager implements IStatsLeaseManager {
     private final List<StatsBorrower> clients = new ArrayList<>();
-    private final ManagedStatsRange currentRange;
+    private final StatsRangeManager currentRange;
 
-    public StatLeaseManager(StatsRange range) {
-        currentRange = new ManagedStatsRange(range);
+    public StatsLeaseManager(StatsRange range) {
+        currentRange = new StatsRangeManager(range);
     }
 
     @Override
@@ -32,7 +32,7 @@ public class StatLeaseManager implements IStatLeaseManager {
     }
 
     @Override
-    public ManagedStatsRange currentRange() {
-        return currentRange;
+    public StatsRange currentRange() {
+        return currentRange.range();
     }
 }

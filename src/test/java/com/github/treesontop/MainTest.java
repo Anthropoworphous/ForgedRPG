@@ -47,6 +47,7 @@ public class MainTest {
         } catch (SQLException | InvalidObjectException e) {
             fail("Database connection failed");
         }
+        System.out.println("Database connection ok");
     }
 
     @Test
@@ -54,6 +55,7 @@ public class MainTest {
         var classes = Util.getAnnotatedClass("com.github.treesontop.events", RegisterEvent.class);
         Main.registerEvent(classes, eventHandler);
         verify(eventHandler, times(classes.size())).addListener(any());
+        System.out.println("Event register ok");
     }
 
     @Test
@@ -63,30 +65,6 @@ public class MainTest {
         Main.registerCommand(classes, commandManager);
 
         verify(commandManager, times(classes.size())).register(any(Command.class));
-    }
-
-    @Test
-    @Order(2)
-    public void testDataBase() {
-//        try {
-//            DataBase.runStatement(UserTable.tableMaker());
-//            DataBase.runStatement(UserTable.insertOrReplace(Map.of(
-//                "money", new SQLInt(SQLDataType.INT, 69),
-//                    "uuid", new SQLText(SQLDataType.TINYTEXT, "TEST")
-//                )));
-//            var q = DataBase.runStatement(UserTable.querySingle(Collections.singleton("money"), Map.of("uuid", new SQLText(SQLDataType.TINYTEXT, "TEST"))));
-//
-//            q.ifPresent(result -> {
-//                try {
-//                    logger.info(String.valueOf(result.getInt("money")));
-//                } catch (SQLException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            });
-//
-//            DataBase.closeDataBase();
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
+        System.out.println("Command register ok");
     }
 }
