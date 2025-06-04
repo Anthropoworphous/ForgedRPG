@@ -11,33 +11,33 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-public class PlayerOnlyCMDBaseTest {
-    private PlayerOnlyCMDBase playerOnlyCMDBase;
+public class UserCMDBaseTest {
+    private UserCMDBase userCMDBase;
     private CommandManager cmdManager;
 
     @BeforeEach
     public void setUp() {
         cmdManager = mock(CommandManager.class);
-        playerOnlyCMDBase = new MockCMD();
+        userCMDBase = new MockCMD();
     }
 
     @Test
     public void testRegister() {
-        playerOnlyCMDBase.register(cmdManager);
+        userCMDBase.register(cmdManager);
         verify(cmdManager, times(1)).register(any(Command.class));
     }
 
     @Test
     public void testExtractBaseCommand() {
-        Command command = playerOnlyCMDBase.extractBaseCommand();
+        Command command = userCMDBase.extractBaseCommand();
         assertEquals("mocked_cmd", command.getName());
     }
 
     @Util.DoNotScan
     @RegisterCommand(value = "mocked_cmd")
-    private static class MockCMD extends PlayerOnlyCMDBase {
+    private static class MockCMD extends UserCMDBase {
         @Override
-        protected void build(PlayerOnlyCMDBuilder builder) {
+        protected void build(UserCMDBuilder builder) {
             Argument<String> arg = ArgumentType.String("arg");
             builder.implement((sender, context) -> {}, arg);
         }

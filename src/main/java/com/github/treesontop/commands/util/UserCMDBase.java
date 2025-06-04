@@ -7,7 +7,7 @@ import net.minestom.server.command.builder.arguments.Argument;
 
 
 
-public abstract class PlayerOnlyCMDBase {
+public abstract class UserCMDBase {
 
 
     /**
@@ -15,7 +15,7 @@ public abstract class PlayerOnlyCMDBase {
      */
     public void register(CommandManager cmdManager) {
         Command cmd = extractBaseCommand();
-        PlayerOnlyCMDBuilder builder = new PlayerOnlyCMDBuilder();
+        UserCMDBuilder builder = new UserCMDBuilder();
         build(builder);
 
         for (int i = 0; i < builder.counts; i++) {
@@ -52,5 +52,5 @@ public abstract class PlayerOnlyCMDBase {
      *
      * @param builder the PlayerOnlyCMDBuilder to use for building the command
      */
-    protected abstract void build(PlayerOnlyCMDBuilder builder);
+    protected abstract void build(UserCMDBuilder builder);
 }

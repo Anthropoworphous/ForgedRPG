@@ -1,7 +1,7 @@
 package com.github.treesontop;
 
 import com.github.treesontop.commands.util.CMDBase;
-import com.github.treesontop.commands.util.PlayerOnlyCMDBase;
+import com.github.treesontop.commands.util.UserCMDBase;
 import com.github.treesontop.commands.util.RegisterCommand;
 import com.github.treesontop.database.DataBase;
 import com.github.treesontop.database.generator.GenerateTable;
@@ -43,7 +43,6 @@ public class Main {
     public static void main(String[] args) {
         Console.link();
         DataBase.connectToDB();
-        TableGenerator.generate(Util.getAnnotatedClass("com.github.treesontop", GenerateTable.class));
 
         startUp(minecraftServer = MinecraftServer.init());
         StatsCycle.startCycle();
@@ -60,6 +59,8 @@ public class Main {
 
         try {
             IGameEntity.registerAll();
+            MinecraftServer.getConnectionManager().setPlayerProvider(User::new);
+            TableGenerator.generate(Util.getAnnotatedClass("com.github.treesontop", GenerateTable.class));
 
             registerEvent(Util.getAnnotatedClass("com.github.treesontop.events", RegisterEvent.class),
                 MinecraftServer.getGlobalEventHandler());
@@ -167,7 +168,7 @@ public class Main {
         for (Class<?> c : classes) {
             switch (c.getDeclaredConstructor().newInstance()) {
                 case CMDBase c1 -> c1.register(commandManager);
-                case PlayerOnlyCMDBase c2 -> c2.register(commandManager);
+                case UserCMDBase c2 -> c2.register(commandManager);
                 default -> throw new RuntimeException("Unknown type");
             }
             logger.info(c.getSimpleName() + " registered");

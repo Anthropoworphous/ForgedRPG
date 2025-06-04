@@ -1,20 +1,19 @@
 package com.github.treesontop.commands.testing;
 
 import com.github.treesontop.Main;
-import com.github.treesontop.commands.util.PlayerOnlyCMDBase;
-import com.github.treesontop.commands.util.PlayerOnlyCMDBuilder;
 import com.github.treesontop.commands.util.RegisterCommand;
-import com.github.treesontop.user.User;
+import com.github.treesontop.commands.util.UserCMDBase;
+import com.github.treesontop.commands.util.UserCMDBuilder;
 import net.minestom.server.command.builder.arguments.number.ArgumentInteger;
 
 @RegisterCommand("self_harm")
-public class SelfHarmCommand extends PlayerOnlyCMDBase {
+public class SelfHarmCommand extends UserCMDBase {
     @Override
-    protected void build(PlayerOnlyCMDBuilder builder) {
+    protected void build(UserCMDBuilder builder) {
         var arg = new ArgumentInteger("dmg");
         builder.implement((exe, ctx) -> {
             var dmg = ctx.get(arg);
-            User.find(exe).character.lossHealth(dmg);
+            exe.character.lossHealth(dmg);
             Main.logger.info("Removed %s health from player".formatted(dmg));
         }, arg);
     }

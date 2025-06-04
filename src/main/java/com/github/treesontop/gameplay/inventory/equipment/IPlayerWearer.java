@@ -10,6 +10,6 @@ public interface IPlayerWearer extends IWeaponHolder, IStatsProfile {
 
     @Override
     default WeaponItem weapon() {
-        return new WeaponItem(user().player.getItemInMainHand());
+        return new WeaponItem(user().getItemInMainHand());
     }
 }

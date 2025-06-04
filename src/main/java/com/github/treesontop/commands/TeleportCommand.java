@@ -1,7 +1,7 @@
 package com.github.treesontop.commands;
 
-import com.github.treesontop.commands.util.PlayerOnlyCMDBase;
-import com.github.treesontop.commands.util.PlayerOnlyCMDBuilder;
+import com.github.treesontop.commands.util.UserCMDBase;
+import com.github.treesontop.commands.util.UserCMDBuilder;
 import com.github.treesontop.commands.util.RegisterCommand;
 import net.minestom.server.command.builder.arguments.ArgumentType;
 import net.minestom.server.command.builder.arguments.minecraft.ArgumentEntity;
@@ -12,9 +12,9 @@ import net.minestom.server.entity.Entity;
 import java.util.List;
 
 @RegisterCommand(value = "tp", alias = {"teleport"})
-public class TeleportCommand extends PlayerOnlyCMDBase {
+public class TeleportCommand extends UserCMDBase {
     @Override
-    protected void build(PlayerOnlyCMDBuilder builder) {
+    protected void build(UserCMDBuilder builder) {
         ArgumentRelativeVec3 posArg = ArgumentType.RelativeVec3("pos");
         ArgumentEntity targetArg = ArgumentType.Entity("target");
         ArgumentEntity otherTargetArg = ArgumentType.Entity("otherTarget").singleEntity(true);

@@ -16,7 +16,7 @@ public class PlayerAttack extends EventBase<EntityAttackEvent> {
 
         var entity = IGameEntity.get(event.getTarget());
         if (!(entity instanceof IStatsProfile enemy)) return Result.SUCCESS;
-        User.find(p).character.attack(enemy);
+        ((User) p).character.attack(enemy);
 
         return Result.SUCCESS;
     }

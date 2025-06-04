@@ -11,25 +11,22 @@ import com.github.treesontop.database.table.Row;
 import com.github.treesontop.database.table.Table;
 import net.minestom.server.entity.GameMode;
 import net.minestom.server.entity.Player;
+import net.minestom.server.network.player.GameProfile;
+import net.minestom.server.network.player.PlayerConnection;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 
 @GenerateTable("user")
-public class User {
-
-    private static final Map<UUID, User> users = new HashMap<>();
-
+public class User extends Player {
     private static Table table;
 
-    public final Player player;
-    public final Character character;
+    public final Character character = new Character(this);
 
     @MakeColumn(name = "uuid", type = SQLDataType.TINYTEXT, config = Column.Config.KEY)
-    public final UUID uuid;
+    public final UUID uuid = getUuid();
 
     @MakeColumn(name = "gamemode", type = SQLDataType.BYTE)
     private byte gamemode = 0;
@@ -37,61 +34,37 @@ public class User {
     @MakeColumn(name = "money", type = SQLDataType.INT)
     private int money = 0;
 
-    private User(Player player) {
-        this.player = player;
-        this.uuid = player.getUuid();
-        character = new Character(this);
+    public User(@NotNull PlayerConnection playerConnection, @NotNull GameProfile gameProfile) {
+        super(playerConnection, gameProfile);
     }
 
-    public static User find(Player player) {
-        return users.get(player.getUuid());
-    }
-    public static User find(UUID uuid) {
-        return users.get(uuid);
-    }
-
-    public static User load(Player player) throws SQLException {
-        Main.logger.info("Loading player " + player.getUsername() + " @" + player.getUuid());
-        var uuid = player.getUuid();
+    public void load() throws SQLException {
+        Main.logger.info("Loading player " + getUsername() + " @" + getUuid());
 
         var resultSet = table.findExact(
             table.column("uuid").fill(new SQLText(SQLDataType.TINYTEXT, uuid.toString())),
             "money", "gamemode"
         ).execute();
 
-        var user = resultSet.map(result -> {
-            var tempUser = new User(player);
+        resultSet.ifPresentOrElse(result -> {
             try {
-                tempUser.money = result.getInt("money");
-                tempUser.gamemode = result.getByte("gamemode");
+                money = result.getInt("money");
+                gamemode = result.getByte("gamemode");
             } catch (SQLException ignored) {}
-            return tempUser;
-        }).orElseGet(() -> new User(player));
+        }, () -> {
+            // new player logic here
+        });
 
-        users.put(uuid, user);
-
-        switch (user.gamemode) {
-            case 0 -> player.setGameMode(GameMode.SURVIVAL);
-            case 1 -> player.setGameMode(GameMode.CREATIVE);
-            case 2 -> player.setGameMode(GameMode.SPECTATOR);
-            case 3 -> player.setGameMode(GameMode.ADVENTURE);
-        }
-
-        return user;
+        setGameMode(GameMode.values()[gamemode]);
     }
+
     public static void save(Player player) throws SQLException {
-        var uuid = player.getUuid();
-        var user = users.remove(uuid);
-        Main.logger.info("Saving player " + player.getUsername() + " @" + uuid);
+        var user = (User) player;
+        Main.logger.info("Saving player " + player.getUsername() + " @" + player.getUuid());
 
-        var mode = switch (player.getGameMode()) {
-            case GameMode.SURVIVAL -> 0;
-            case GameMode.CREATIVE -> 1;
-            case GameMode.SPECTATOR -> 2;
-            case GameMode.ADVENTURE -> 3;
-        };
+        var mode = player.getGameMode().ordinal();
 
-        var row = new Row(table, table.key().fill(new SQLText(SQLDataType.TINYTEXT, uuid.toString())),
+        var row = new Row(table, table.key().fill(new SQLText(SQLDataType.TINYTEXT, player.getUuid().toString())),
             table.column("money").fill(new SQLInt(SQLDataType.INT, user.money)),
             table.column("gamemode").fill(new SQLInt(SQLDataType.BYTE, mode))
         );
@@ -99,10 +72,6 @@ public class User {
         Main.logger.info("Data: [%s]".formatted(row.toString()));
 
         table.insert().insert(row).execute();
-    }
-
-    public void msg(String msg) {
-        player.sendMessage(msg);
     }
 
 

@@ -1,18 +1,18 @@
 package com.github.treesontop.commands.util;
 
 import com.github.treesontop.Main;
+import com.github.treesontop.user.User;
 import net.minestom.server.command.CommandSender;
 import net.minestom.server.command.builder.CommandContext;
 import net.minestom.server.command.builder.CommandExecutor;
 import net.minestom.server.command.builder.arguments.Argument;
-import net.minestom.server.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
 
-public class PlayerOnlyCMDBuilder extends CMDBuilder {
+public class UserCMDBuilder extends CMDBuilder {
 
 
     /**
@@ -23,7 +23,7 @@ public class PlayerOnlyCMDBuilder extends CMDBuilder {
      * @param args       the command arguments
      * @return the PlayerOnlyCMDBuilder instance
      */
-    public PlayerOnlyCMDBuilder implement(PlayerExecutor exe, Consumer<ArgumentAnnotator> annotation, Argument<?>... args) {
+    public UserCMDBuilder implement(UserExecutor exe, Consumer<ArgumentAnnotator> annotation, Argument<?>... args) {
         this.implement((CommandExecutor) exe, annotation, args);
         return this;
     }
@@ -35,19 +35,19 @@ public class PlayerOnlyCMDBuilder extends CMDBuilder {
      * @param args the command arguments
      * @return the PlayerOnlyCMDBuilder instance
      */
-    public PlayerOnlyCMDBuilder implement(PlayerExecutor exe, Argument<?>... args) {
+    public UserCMDBuilder implement(UserExecutor exe, Argument<?>... args) {
         this.implement((CommandExecutor) exe, args);
         return this;
     }
 
     @FunctionalInterface
-    public interface PlayerExecutor extends CommandExecutor {
-        void apply(@NotNull Player sender, @NotNull CommandContext context);
+    public interface UserExecutor extends CommandExecutor {
+        void apply(@NotNull User sender, @NotNull CommandContext context);
 
         @Override
         default void apply(@NotNull CommandSender sender, @NotNull CommandContext context) {
-            if (sender instanceof Player p) {
-                apply(p, context);
+            if (sender instanceof User user) {
+                apply(user, context);
             } else {
                 String errorMessage = "This command can only be executed by a player!";
                 Main.logger.log(Level.WARNING, errorMessage);

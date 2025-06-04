@@ -9,8 +9,6 @@ import java.util.Set;
 
 
 public class TableGenerator {
-
-
     public static void generate(Set<Class<?>> classes) {
         Main.logger.info("Generating " + classes.size() + " tables");
 

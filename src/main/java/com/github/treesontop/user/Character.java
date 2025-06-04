@@ -24,7 +24,7 @@ public class Character extends StatsHolder implements IDefaultStatsProfile, IPla
         MinecraftServer.getSchedulerManager().scheduleTask(() -> Main.instances.values().stream()
             .flatMap(world -> world.getPlayers().stream())
             .forEach(player -> {
-                var character = User.find(player).character;
+                var character = ((User) player).character;
                 var hp = character.snapshot().get(Health.class);
                 var maxHp = character.health().range().max();
                 var hpBar = Math.round(hp / maxHp * totalHealthBarLength);
